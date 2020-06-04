@@ -1,27 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
+import { toast } from "react-toastify";
 import Joi from "joi-browser";
-import { userAdded } from "../store/users";
+import { addUser, userErrors, getErrors } from "../store/users";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "./common/input";
 
 const UserForm = ({ match }) => {
   const users = useSelector((state) => state.entities.users);
+  let errors = useSelector((state) => state.entities.users.errors);
+  const errors2 = getErrors();
+  const userError = useSelector((state) => state.entities.users.error);
 
-  const [user, setUser] = useState({
-    username: "",
-    password: "",
-    firstname: "",
-    lastname: "",
-    role: "admin",
-  });
-  const [errors, setErrors] = useState({});
+  const [user, setUser] = useState(
+    {
+      username: "",
+      password: "",
+      firstname: "",
+      lastname: "",
+      isAdmin: "admin",
+    },
+    [errors]
+  );
+
+  // const [errors, setErrors] = useState({});
   const [redirectToUsers, setRedirectToUsers] = useState(false);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     populateUser();
+    console.log(errors);
   }, []);
 
   const schema = {
@@ -29,7 +38,7 @@ const UserForm = ({ match }) => {
     password: Joi.string().min(5).required().label("Password"),
     firstname: Joi.string().required().label("First Name"),
     lastname: Joi.string().required().label("Last Name"),
-    role: Joi.string().required().label("Role"),
+    isAdmin: Joi.string().required().label("isAdmin"),
   };
 
   const validate = () => {
@@ -41,6 +50,7 @@ const UserForm = ({ match }) => {
 
     const errors = {};
     for (let item of error.details) errors[item.path[0]] = item.message;
+
     return errors;
   };
 
@@ -49,7 +59,6 @@ const UserForm = ({ match }) => {
     if (userId === "new") return;
 
     const getUser = users.find((user) => user._id == userId);
-    console.log(getUser);
     mapToViewModel(getUser);
   };
 
@@ -60,7 +69,7 @@ const UserForm = ({ match }) => {
       password: user.password,
       firstname: user.firstname,
       lastname: user.lastname,
-      role: user.role,
+      isAdmin: user.isAdmin,
     };
   };
 
@@ -72,26 +81,35 @@ const UserForm = ({ match }) => {
 
   const handleChangeRadio = ({ currentTarget: input }) => {
     const newUser = { ...user };
-    newUser.role = input.name;
+    newUser.isAdmin = input.name === "admin";
     setUser(newUser);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const errors = validate();
-    setErrors(errors || {});
+    errors = validate();
+    dispatch(userErrors({ errors }));
+
     if (errors) return;
 
+    errors = {};
+
+    console.log(errors);
+    console.log(errors2);
+
     dispatch(
-      userAdded({
+      addUser({
         username: user.username,
         password: user.password,
         firstname: user.firstname,
         lastname: user.lastname,
-        role: user.role,
+        isAdmin: user.isAdmin === "admin",
       })
     );
-    setRedirectToUsers(true);
+
+    // console.log(userError);
+    if (userError) return;
+    // setRedirectToUsers(true);
   };
 
   const cancel = () => {
@@ -152,7 +170,7 @@ const UserForm = ({ match }) => {
                     className="with-gap"
                     name="admin"
                     type="radio"
-                    checked={user.role === "admin"}
+                    checked={user.isAdmin}
                     onChange={(e) => handleChangeRadio(e)}
                   />
                   <span>Admin</span>
@@ -164,7 +182,7 @@ const UserForm = ({ match }) => {
                     className="with-gap"
                     name="cashier"
                     type="radio"
-                    checked={user.role === "cashier"}
+                    checked={!user.isAdmin}
                     onChange={(e) => handleChangeRadio(e)}
                   />
                   <span>Cashier</span>

@@ -5,10 +5,6 @@ import { Link } from "react-router-dom";
 const UsersTable = ({ users, onSort, sortColumn, onDelete, onEdit }) => {
   const columns = [
     {
-      path: "_id",
-      label: "ID",
-    },
-    {
       path: "username",
       label: "Username",
     },
@@ -22,8 +18,8 @@ const UsersTable = ({ users, onSort, sortColumn, onDelete, onEdit }) => {
       path: "role",
       label: "Role",
       content: (user) => (
-        <span className={user.role === "admin" ? "role green" : "role blue"}>
-          {user.role.toUpperCase()}
+        <span className={user.isAdmin ? "role green" : "role blue"}>
+          {user.isAdmin ? "ADMIN" : "CASHIER"}
         </span>
       ),
     },

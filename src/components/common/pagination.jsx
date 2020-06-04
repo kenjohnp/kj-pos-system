@@ -16,7 +16,9 @@ const Pagination = (props) => {
           className={page === currentPage ? "active green" : "waves-effect"}
           style={{ cursor: "pointer" }}
         >
-          <a onClick={() => onPageChange(page)}>{page}</a>
+          <a href="#" onClick={() => onPageChange(page)}>
+            {page}
+          </a>
         </li>
       ))}
     </ul>

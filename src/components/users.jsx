@@ -1,16 +1,19 @@
-import React, { useState, userEffect, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
 import _ from "lodash";
-import { getUsers, deleteUser } from "../services/fakeUserService";
 import UsersTable from "./usersTable";
 import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate";
 import { useSelector, useDispatch } from "react-redux";
-import { userRemoved } from "../store/users";
+import { deleteUser, loadUsers } from "../store/users";
 
 const Users = () => {
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.entities.users);
+  const users = useSelector((state) => state.entities.users.list);
+
+  useEffect(() => {
+    dispatch(loadUsers());
+  });
 
   const [sortColumn, setSortColumn] = useState({
     path: "username",
@@ -21,8 +24,9 @@ const Users = () => {
     currentPage: 1,
   });
 
-  const handleDelete = (user) => {
-    dispatch(userRemoved({ _id: user }));
+  const handleDelete = (userId) => {
+    console.log(userId);
+    dispatch(deleteUser({ _id: userId }));
   };
 
   const handleEdit = (id) => {
