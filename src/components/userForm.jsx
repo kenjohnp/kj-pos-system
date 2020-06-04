@@ -2,28 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { toast } from "react-toastify";
 import Joi from "joi-browser";
-import { addUser, userErrors, getErrors } from "../store/users";
+import { addUser, setUserErrors } from "../store/users";
 import { useDispatch, useSelector } from "react-redux";
+
 import Input from "./common/input";
 
 const UserForm = ({ match }) => {
   const users = useSelector((state) => state.entities.users);
-  let errors = useSelector((state) => state.entities.users.errors);
-  const errors2 = getErrors();
-  const userError = useSelector((state) => state.entities.users.error);
+  const errors = useSelector((state) => state.entities.users.errors);
 
-  const [user, setUser] = useState(
-    {
-      username: "",
-      password: "",
-      firstname: "",
-      lastname: "",
-      isAdmin: "admin",
-    },
-    [errors]
-  );
+  const [user, setUser] = useState({
+    username: "",
+    password: "",
+    firstname: "",
+    lastname: "",
+    isAdmin: "admin",
+  });
 
-  // const [errors, setErrors] = useState({});
   const [redirectToUsers, setRedirectToUsers] = useState(false);
 
   const dispatch = useDispatch();
@@ -87,15 +82,11 @@ const UserForm = ({ match }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    errors = validate();
-    dispatch(userErrors({ errors }));
-
-    if (errors) return;
-
-    errors = {};
+    let formErrors = validate();
+    dispatch(setUserErrors({ errors: formErrors || {} }));
 
     console.log(errors);
-    console.log(errors2);
+    if (formErrors) return;
 
     dispatch(
       addUser({
@@ -106,10 +97,6 @@ const UserForm = ({ match }) => {
         isAdmin: user.isAdmin === "admin",
       })
     );
-
-    // console.log(userError);
-    if (userError) return;
-    // setRedirectToUsers(true);
   };
 
   const cancel = () => {
@@ -131,7 +118,7 @@ const UserForm = ({ match }) => {
       columnClass={customClass}
       onChange={(e) => handleChange(e)}
       type={type}
-      error={errors[name]}
+      error={errors.formErrors[name]}
     />
   );
 
@@ -139,6 +126,11 @@ const UserForm = ({ match }) => {
     <div className="container">
       {redirectToUsers && <Redirect to="/users" />}
       <h4>{match.params.id === "new" ? "New User" : "Edit User"}</h4>
+      {errors.apiError.message && (
+        <blockquote className="red white-text">
+          {errors.apiError.message}
+        </blockquote>
+      )}
       <div className="row">
         <form className="col s8">
           <div className="row">

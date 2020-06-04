@@ -11,7 +11,11 @@ const slice = createSlice({
     list: [],
     loading: false,
     lastFetch: null,
-    errors: {},
+    errors: {
+      apiError: {},
+      formErrors: {},
+    },
+    success: false,
   },
   reducers: {
     usersRequested: (users, action) => {
@@ -31,13 +35,11 @@ const slice = createSlice({
     userRemoved: (users, action) => {
       users.list = users.list.filter((user) => user._id !== action.payload._id);
     },
-    userErrors: (users, action) => {
-      users.errors = action.payload.errors;
-      users.loading = false;
+    setUserErrors: (users, action) => {
+      users.errors.formErrors = action.payload.errors;
     },
-    userApiError: (users, action) => {
-      users.errors.apiError = action.payload;
-      users.loading = false;
+    setApiError: (users, action) => {
+      users.errors.apiError = action.payload.errors;
     },
   },
 });
@@ -48,8 +50,8 @@ export const {
   usersRequested,
   usersReceived,
   usersRequestFailed,
-  userErrors,
-  userApiError,
+  setUserErrors,
+  setApiError,
 } = slice.actions;
 export default slice.reducer;
 
@@ -78,7 +80,7 @@ export const addUser = (user) =>
     method: "post",
     data: user,
     onSuccess: userAdded.type,
-    onError: userApiError.type,
+    onError: setApiError.type,
   });
 
 export const deleteUser = (user) =>
@@ -86,5 +88,5 @@ export const deleteUser = (user) =>
     url: url + "/" + user._id,
     method: "delete",
     onSuccess: userRemoved.type,
-    onError: userApiError.type,
+    onError: setApiError.type,
   });
