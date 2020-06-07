@@ -1,25 +1,17 @@
 import React from "react";
 
 const Input = ({
-  placeholder,
   name,
-  value,
-  onChange,
-  columnClass,
   label,
   type = "text",
   error,
+  value,
+  customClass,
+  ...rest
 }) => {
   return (
-    <div className={"input-field " + columnClass}>
-      <input
-        placeholder={placeholder}
-        type={type}
-        id={name}
-        value={value}
-        name={name}
-        onChange={onChange}
-      />
+    <div className={"input-field " + customClass}>
+      <input type={type} name={name} value={value} {...rest} />
       <label htmlFor={name} className="active">
         {label}
       </label>

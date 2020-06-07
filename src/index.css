@@ -29,8 +29,16 @@ code {
   margin-left: 0.3rem;
 }
 
+.ml-2 {
+  margin-left: 0.6rem;
+}
+
 .mb-0 {
   margin-bottom: 0 !important;
+}
+
+.mb-1 {
+  margin-bottom: 1rem !important;
 }
 
 .mt-5 {
@@ -51,4 +59,9 @@ code {
 
 td {
   padding: 5px !important;
+}
+
+.statusBox {
+  padding: 0.5rem;
+  border-radius: 2px;
 }

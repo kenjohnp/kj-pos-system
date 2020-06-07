@@ -6,6 +6,7 @@ import App from "./App";
 import Footer from "./components/footer";
 import * as serviceWorker from "./serviceWorker";
 import "materialize-css/dist/css/materialize.min.css";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import "font-awesome/css/font-awesome.css";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
