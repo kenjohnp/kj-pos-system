@@ -8,8 +8,7 @@ import { renderInput, renderButton } from "../common/renderForms";
 
 const UserResetPassword = ({ match }) => {
   const dispatch = useDispatch();
-  const errors = useSelector((state) => state.entities.users.errors);
-  const success = useSelector((state) => state.entities.users.success);
+  const { errors, success } = useSelector((state) => state.entities.users);
 
   const [user, setUser] = useState({ password: "" });
   const [redirectToUsers, setRedirectToUsers] = useState(false);

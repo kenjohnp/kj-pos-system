@@ -1,13 +1,14 @@
 import React, { Fragment } from "react";
+import { Link } from "react-router-dom";
 
 const SideNav = () => {
   return (
     <Fragment>
       <ul id="slide-out" className="sidenav">
         <li>
-          <a href="#!">
+          <Link to="/users">
             <i className="material-icons">account_circle</i>Users
-          </a>
+          </Link>
         </li>
         <li>
           <a href="#!">
@@ -15,9 +16,9 @@ const SideNav = () => {
           </a>
         </li>
         <li>
-          <a href="#!">
+          <Link to="/categories">
             <i className="material-icons">storage</i>Categories
-          </a>
+          </Link>
         </li>
         <li>
           <a href="#!">

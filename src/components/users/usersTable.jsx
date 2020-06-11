@@ -25,8 +25,8 @@ const UsersTable = ({ users, onSort, sortColumn, onDelete, onChange }) => {
       content: (user) => (
         <Switch
           checked={user.isAdmin}
-          onChange={() => onChange(user._id, user.isAdmin, user)}
-        ></Switch>
+          onChange={() => onChange(user._id, user.isAdmin)}
+        />
       ),
     },
     {

@@ -28,7 +28,7 @@ const NavBar = () => {
                 <a href="badges.html">Products</a>
               </li>
               <li>
-                <a href="collapsible.html">Categories</a>
+                <NavLink to="/categories">Categories</NavLink>
               </li>
               <li>
                 <a href="collapsible.html">Supplier</a>

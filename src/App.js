@@ -7,6 +7,8 @@ import Users from "./components/users/users";
 import UserForm from "./components/users/userForm";
 import UserResetPassword from "./components/users/userResetPassword";
 import ChangeName from "./components/users/changeName";
+import Categories from "./components/categories/categories";
+import AddCategory from "./components/categories/addCategory";
 import Login from "./components/login";
 import Logout from "./components/common/logout";
 import { Route, Switch, Redirect } from "react-router-dom";
@@ -25,21 +27,20 @@ function App() {
           <SideNav />
           <ToastContainer />
           <Switch>
-            <Route path="/login" component={Login}></Route>
-            <Route path="/logout" component={Logout}></Route>
+            <Route path="/login" component={Login} />
+            <Route path="/logout" component={Logout} />
             <ProtectedRoute
               path="/users/resetpassword/:id"
               component={UserResetPassword}
-            ></ProtectedRoute>
+            />
             <ProtectedRoute
               path="/users/changename/:id"
               component={ChangeName}
-            ></ProtectedRoute>
-            <ProtectedRoute
-              path="/users/new"
-              component={UserForm}
-            ></ProtectedRoute>
-            <ProtectedRoute path="/users" component={Users}></ProtectedRoute>
+            />
+            <ProtectedRoute path="/users/new" component={UserForm} />
+            <ProtectedRoute path="/users" component={Users} />
+            <ProtectedRoute path="/categories/new" component={AddCategory} />
+            <ProtectedRoute path="/categories" component={Categories} />
             <ProtectedRoute path="/" exact component={Users} />
           </Switch>
         </div>
