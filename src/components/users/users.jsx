@@ -1,10 +1,11 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
-import _ from "lodash";
 import { useSelector, useDispatch } from "react-redux";
 import UsersTable from "./usersTable";
 import Pagination from "../common/pagination";
-import { paginate } from "../../utils/paginate";
+import Search from "../common/search";
+import PageTitle from "../common/pageTitle";
+import getPagedData from "../../utils/getPagedData";
 import {
   deleteUser,
   loadUsers,
@@ -15,12 +16,6 @@ import {
 const Users = () => {
   const dispatch = useDispatch();
   const { list: users, loading } = useSelector((state) => state.entities.users);
-
-  useEffect(() => {
-    dispatch(loadUsers());
-    dispatch(setSuccess(false));
-  });
-
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState({
     path: "username",
@@ -29,6 +24,11 @@ const Users = () => {
   const [pagination, setPagination] = useState({
     pageSize: 7,
     currentPage: 1,
+  });
+
+  useEffect(() => {
+    dispatch(loadUsers());
+    dispatch(setSuccess(false));
   });
 
   const handleDelete = (userId) => {
@@ -53,33 +53,17 @@ const Users = () => {
     setPagination(currentPagination);
   };
 
-  const getPagedData = () => {
-    let filtered = users;
-
-    if (searchQuery)
-      filtered = users.filter(
-        (u) =>
-          u.firstname.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
-          u.username.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
-          u.lastname.toLowerCase().startsWith(searchQuery.toLowerCase())
-      );
-
-    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
-    const paginatedUsers = paginate(
-      sorted,
-      pagination.currentPage,
-      pagination.pageSize
-    );
-
-    return { totalCount: sorted.length, data: paginatedUsers };
-  };
-
-  const { totalCount, data } = getPagedData();
+  const { totalCount, data } = getPagedData({
+    data: users,
+    searchQuery,
+    searchFields: ["firstname", "username", "lastname"],
+    sortColumn,
+    pagination,
+  });
 
   return (
     <Fragment>
-      <h4 className="green-text left-align">Users</h4>
+      <PageTitle title="Users" />
       <div className="row mb-0 valign-wrapper">
         <div className="col s8">
           <Link
@@ -89,16 +73,7 @@ const Users = () => {
             <i className="material-icons">add</i>
           </Link>
         </div>
-        <div className="input-field col s4 right-align">
-          <i className="material-icons prefix">search</i>
-          <input
-            id="icon_prefix"
-            type="text"
-            value={searchQuery}
-            onChange={handleChange}
-          />
-          <label htmlFor="icon_prefix">Search</label>
-        </div>
+        <Search searchQuery={searchQuery} onChange={(e) => handleChange(e)} />
       </div>
       <UsersTable
         users={data}

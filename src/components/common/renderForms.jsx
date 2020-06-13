@@ -4,14 +4,11 @@ import Input from "./input";
 export const renderInput = ({
   name,
   label,
-  customClass,
   data,
   error,
-  onChange,
   placeholder,
   type,
-  readOnly,
-  defaultValue,
+  ...rest
 }) => (
   <div className="row">
     <Input
@@ -19,12 +16,9 @@ export const renderInput = ({
       placeholder={placeholder || ""}
       name={name}
       value={data}
-      customClass={customClass}
-      onChange={onChange}
       type={type || "text"}
       error={error}
-      readOnly={readOnly}
-      defaultValue={defaultValue}
+      {...rest}
     />
   </div>
 );

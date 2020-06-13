@@ -9,6 +9,8 @@ import UserResetPassword from "./components/users/userResetPassword";
 import ChangeName from "./components/users/changeName";
 import Categories from "./components/categories/categories";
 import AddCategory from "./components/categories/addCategory";
+import Products from "./components/products/products";
+import ProductForm from "./components/products/productForm";
 import Login from "./components/login";
 import Logout from "./components/common/logout";
 import { Route, Switch, Redirect } from "react-router-dom";
@@ -41,6 +43,8 @@ function App() {
             <ProtectedRoute path="/users" component={Users} />
             <ProtectedRoute path="/categories/new" component={AddCategory} />
             <ProtectedRoute path="/categories" component={Categories} />
+            <ProtectedRoute path="/products/:id" component={ProductForm} />
+            <ProtectedRoute path="/products" component={Products} />
             <ProtectedRoute path="/" exact component={Users} />
           </Switch>
         </div>

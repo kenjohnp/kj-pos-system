@@ -25,7 +25,7 @@ const NavBar = () => {
                 <NavLink to="/users">Users</NavLink>
               </li>
               <li>
-                <a href="badges.html">Products</a>
+                <NavLink to="/products">Products</NavLink>
               </li>
               <li>
                 <NavLink to="/categories">Categories</NavLink>

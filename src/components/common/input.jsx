@@ -7,10 +7,12 @@ const Input = ({
   error,
   value,
   customClass,
+  icon,
   ...rest
 }) => {
   return (
     <div className={"input-field " + customClass}>
+      {icon && <i className="material-icons prefix">{icon}</i>}
       <input type={type} name={name} value={value} {...rest} />
       <label htmlFor={name} className="active">
         {label}

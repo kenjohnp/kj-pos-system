@@ -1,25 +1,20 @@
-import React, { Fragment, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { Fragment, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { loadProducts, setSuccess, removeProduct } from "../../store/products";
 import getPagedData from "../../utils/getPagedData";
-import {
-  loadCategories,
-  updateCategory,
-  removeCategory,
-  setSuccess,
-} from "../../store/categories";
-import CategoriesTable from "./categoriesTable";
+import PageTitle from "../common/pageTitle";
+import ProductsTable from "./productsTable";
 import Pagination from "../common/pagination";
 import Search from "../common/search";
-import PageTitle from "../common/pageTitle";
 
-const Categories = () => {
+const Products = () => {
   const dispatch = useDispatch();
-  const { list: categories, loading } = useSelector(
-    (state) => state.entities.categories
+  const { list: products, loading } = useSelector(
+    (state) => state.entities.products
   );
   const [sortColumn, setSortColumn] = useState({
-    path: "name",
+    path: "description",
     order: "asc",
   });
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,24 +24,20 @@ const Categories = () => {
   });
 
   useEffect(() => {
-    dispatch(loadCategories());
+    dispatch(loadProducts());
     dispatch(setSuccess(false));
-  }, []);
+  }, [products]);
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
   };
 
-  const handleDelete = (categoryId) => {
-    dispatch(removeCategory({ _id: categoryId }));
-  };
-
-  const handleEnabled = (id, enabled) => {
-    dispatch(updateCategory({ _id: id, enabled: !enabled }));
-  };
-
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);
+  };
+
+  const handleDelete = (id) => {
+    dispatch(removeProduct({ _id: id }));
   };
 
   const handlePageChange = (currentPage) => {
@@ -56,42 +47,43 @@ const Categories = () => {
   };
 
   const { totalCount, data } = getPagedData({
-    data: categories,
+    data: products,
     searchQuery,
-    searchFields: ["name"],
+    searchFields: ["description", "barcode"],
     sortColumn,
     pagination,
   });
 
+  const { pageSize, currentPage } = pagination;
+
   return (
     <Fragment>
-      <PageTitle title="Categories" />
+      <PageTitle title="Products" />
       <div className="row mb-0 valign-wrapper">
         <div className="col s8">
           <Link
             className="btn-floating btn-large waves-effect waves-light green left-align"
-            to="/categories/new"
+            to="/products/new"
           >
             <i className="material-icons">add</i>
           </Link>
         </div>
-        <Search searchQuery={searchQuery} onChange={(e) => handleChange(e)} />
+        <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
-      <CategoriesTable
-        categories={data}
+      <ProductsTable
+        products={data}
         sortColumn={sortColumn}
-        onChange={handleEnabled}
-        onDelete={(id) => handleDelete(id)}
         onSort={(sortColumn) => handleSort(sortColumn)}
+        onDelete={handleDelete}
       />
       <Pagination
         itemsCount={totalCount}
-        pageSize={pagination.pageSize}
-        currentPage={pagination.currentPage}
+        pageSize={pageSize}
+        currentPage={currentPage}
         onPageChange={(currentPage) => handlePageChange(currentPage)}
       />
     </Fragment>
   );
 };
 
-export default Categories;
+export default Products;

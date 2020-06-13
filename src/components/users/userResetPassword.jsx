@@ -5,6 +5,7 @@ import validate from "../../utils/validate";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser, setUserErrors } from "../../store/users";
 import { renderInput, renderButton } from "../common/renderForms";
+import PageTitle from "../common/pageTitle";
 
 const UserResetPassword = ({ match }) => {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ const UserResetPassword = ({ match }) => {
   return (
     <Fragment>
       {redirectToUsers && <Redirect to="/users" />}
-      <h4 className="green-text left-align">Reset Password</h4>
+      <PageTitle title="Reset Password" />
       <form className="col s8">
         {renderInput({
           name: "password",

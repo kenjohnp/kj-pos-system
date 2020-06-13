@@ -9,8 +9,9 @@ import {
   renderButton,
   renderRadioButton,
 } from "../common/renderForms";
+import PageTitle from "../common/pageTitle";
 
-const UserForm = ({ match }) => {
+const UserForm = () => {
   const dispatch = useDispatch();
   const { success, errors } = useSelector((state) => state.entities.users);
 
@@ -75,7 +76,7 @@ const UserForm = ({ match }) => {
   return (
     <Fragment>
       {(redirectToUsers || success) && <Redirect to="/users" />}
-      <h4 className="green-text">New User</h4>
+      <PageTitle title="New User" />
 
       <div className="row">
         <form className="col s8">
