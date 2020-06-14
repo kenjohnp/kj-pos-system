@@ -1,7 +1,12 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { getUser, setUserErrors, updateUser } from "../../store/users";
+import {
+  getUser,
+  setUserErrors,
+  updateUser,
+  clearErrors,
+} from "../../store/users";
 import validate from "../../utils/validate";
 import Joi from "joi-browser";
 import { renderInput, renderButton } from "../common/renderForms";
@@ -24,6 +29,9 @@ const ChangeName = ({ match }) => {
   useEffect(() => {
     setUser(selectedUser);
     dispatch(getUser({ _id: match.params.id }));
+    return () => {
+      dispatch(clearErrors());
+    };
   }, []);
 
   useEffect(() => {

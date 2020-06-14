@@ -1,9 +1,9 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
 import validate from "../../utils/validate";
 import { useSelector, useDispatch } from "react-redux";
-import { updateUser, setUserErrors } from "../../store/users";
+import { updateUser, setUserErrors, clearErrors } from "../../store/users";
 import { renderInput, renderButton } from "../common/renderForms";
 import PageTitle from "../common/pageTitle";
 
@@ -17,6 +17,12 @@ const UserResetPassword = ({ match }) => {
   const schema = {
     password: Joi.string().min(5).required().label("Password"),
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, []);
 
   const handleChange = ({ currentTarget: input }) => {
     const newUser = { ...user };
@@ -41,7 +47,7 @@ const UserResetPassword = ({ match }) => {
 
   return (
     <Fragment>
-      {redirectToUsers && <Redirect to="/users" />}
+      {(redirectToUsers || success) && <Redirect to="/users" />}
       <PageTitle title="Reset Password" />
       <form className="col s8">
         {renderInput({

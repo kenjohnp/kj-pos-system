@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { NavLink } from "react-router-dom";
 import auth from "../services/authService";
 
@@ -21,24 +21,29 @@ const NavBar = () => {
           </a>
           {auth.getCurrentUser() && (
             <ul id="nav-mobile" className="right hide-on-med-and-down">
-              <li>
-                <NavLink to="/users">Users</NavLink>
-              </li>
-              <li>
-                <NavLink to="/products">Products</NavLink>
-              </li>
-              <li>
-                <NavLink to="/categories">Categories</NavLink>
-              </li>
-              <li>
-                <a href="collapsible.html">Supplier</a>
-              </li>
-              <li>
-                <a href="collapsible.html">Stock Entry</a>
-              </li>
-              <li>
-                <a href="collapsible.html">Reports</a>
-              </li>
+              {auth.getCurrentUser().isAdmin && (
+                <Fragment>
+                  <li>
+                    <NavLink to="/users">Users</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/products">Products</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/categories">Categories</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/suppliers">Supplier</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/stockentry">Stock Entry</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/reports">Reports</NavLink>
+                  </li>
+                </Fragment>
+              )}
+
               <li>
                 <NavLink to="/logout">Logout</NavLink>
               </li>

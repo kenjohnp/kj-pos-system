@@ -11,11 +11,12 @@ import {
   loadUsers,
   updateUser,
   setSuccess,
+  clearErrors,
 } from "../../store/users";
 
 const Users = () => {
   const dispatch = useDispatch();
-  const { list: users, loading } = useSelector((state) => state.entities.users);
+  const { list: users, errors } = useSelector((state) => state.entities.users);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState({
     path: "username",
@@ -29,6 +30,9 @@ const Users = () => {
   useEffect(() => {
     dispatch(loadUsers());
     dispatch(setSuccess(false));
+    return () => {
+      dispatch(clearErrors());
+    };
   }, []);
 
   const handleDelete = (userId) => {
@@ -64,6 +68,11 @@ const Users = () => {
   return (
     <Fragment>
       <PageTitle title="Users" />
+      {errors.apiError.message && (
+        <div className="red white-text center statusBox">
+          {errors.apiError.message}
+        </div>
+      )}
       <div className="row mb-0 valign-wrapper">
         <div className="col s8">
           <Link

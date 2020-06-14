@@ -34,11 +34,13 @@ const slice = createSlice({
       users.loading = false;
     },
     usersRequestFailed: (users, action) => {
+      users.errors.apiError = action.payload.errors;
       users.loading = false;
     },
     userAdded: (users, action) => {
       users.list.push(action.payload);
       users.success = true;
+      users.loading = false;
     },
     userRemoved: (users, action) => {
       users.list = users.list.filter((user) => user._id !== action.payload._id);
@@ -47,8 +49,9 @@ const slice = createSlice({
       const { _id } = action.payload;
       const index = users.list.findIndex((user) => user._id === _id);
 
-      for (let key in action.payload)
-        users.list[index][key] = action.payload[key];
+      if (index > -1)
+        for (let key in action.payload)
+          users.list[index][key] = action.payload[key];
 
       users.success = true;
     },
@@ -57,6 +60,13 @@ const slice = createSlice({
     },
     setApiError: (users, action) => {
       users.errors.apiError = action.payload.errors;
+      users.loading = false;
+    },
+    errorsCleared: (users, action) => {
+      users.errors = {
+        apiError: {},
+        formErrors: {},
+      };
     },
     setSuccess: (users, action) => {
       users.success = action.payload;
@@ -75,6 +85,7 @@ export const {
   userUpdated,
   setUserErrors,
   setApiError,
+  errorsCleared,
   setSuccess,
 } = slice.actions;
 
@@ -104,6 +115,7 @@ export const addUser = (user) =>
     url,
     method: "post",
     data: user,
+    onStart: usersRequested.type,
     onSuccess: userAdded.type,
     onError: setApiError.type,
   });
@@ -133,5 +145,4 @@ export const getUser = (user) =>
     onError: setApiError.type,
   });
 
-//SELECTORS
-export const getUsers = () => createSelector((state) => state.entities.users);
+export const clearErrors = () => (dispatch) => dispatch(errorsCleared());

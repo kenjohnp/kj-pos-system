@@ -33,7 +33,6 @@ const slice = createSlice({
       products.lastFetch = Date.now();
     },
     productsRequestFailed: (products, action) => {
-      console.log("failed");
       products.errors.apiError = action.payload.errors;
       products.loading = false;
     },
@@ -51,15 +50,20 @@ const slice = createSlice({
 
       const index = products.list.findIndex((product) => product._id === _id);
 
-      if (index > -1) {
+      if (index > -1)
         for (let key in action.payload)
           products.list[index][key] = action.payload[key];
-      }
 
       products.success = true;
     },
     setProductErrors: (products, action) => {
       products.errors.formErrors = action.payload.errors;
+    },
+    errorsCleared: (products, action) => {
+      products.errors = {
+        formErrors: {},
+        apiError: {},
+      };
     },
     setApiError: (products, action) => {
       products.errors.apiError = action.payload.errors;
@@ -79,6 +83,7 @@ export const {
   productUpdated,
   productRemoved,
   setProductErrors,
+  errorsCleared,
   setApiError,
   setSuccess,
 } = slice.actions;
@@ -137,3 +142,5 @@ export const getProduct = (product) =>
     onSuccess: productReceived.type,
     onError: setApiError.type,
   });
+
+export const clearErrors = () => (dispatch) => dispatch(errorsCleared());

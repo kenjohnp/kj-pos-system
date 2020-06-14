@@ -11,6 +11,7 @@ import {
   addProduct,
   getProduct,
   updateProduct,
+  clearErrors,
 } from "../../store/products";
 import { loadCategories } from "../../store/categories";
 
@@ -46,6 +47,10 @@ const ProductForm = ({ match }) => {
     dispatch(loadCategories());
     if (match.params.id !== "new")
       dispatch(getProduct({ _id: match.params.id }));
+
+    return () => {
+      dispatch(clearErrors());
+    };
   }, []);
 
   useEffect(() => {

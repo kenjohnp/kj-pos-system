@@ -2,7 +2,7 @@ import React, { useEffect, useState, Fragment } from "react";
 import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
 import validate from "../../utils/validate";
-import { addUser, setUserErrors } from "../../store/users";
+import { addUser, setUserErrors, clearErrors } from "../../store/users";
 import { useDispatch, useSelector } from "react-redux";
 import {
   renderInput,
@@ -10,10 +10,13 @@ import {
   renderRadioButton,
 } from "../common/renderForms";
 import PageTitle from "../common/pageTitle";
+import Loader from "../common/loader";
 
 const UserForm = () => {
   const dispatch = useDispatch();
-  const { success, errors } = useSelector((state) => state.entities.users);
+  const { success, errors, loading } = useSelector(
+    (state) => state.entities.users
+  );
 
   const initialValue = {
     username: "",
@@ -28,7 +31,10 @@ const UserForm = () => {
 
   useEffect(() => {
     if (success) setUser(initialValue);
-  }, [success, initialValue]);
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, []);
 
   const schema = {
     username: Joi.string().min(5).required().label("Username"),
@@ -77,66 +83,69 @@ const UserForm = () => {
     <Fragment>
       {(redirectToUsers || success) && <Redirect to="/users" />}
       <PageTitle title="New User" />
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="row">
+          <form className="col s8">
+            {errors.apiError.message && (
+              <div className="statusBox red white-text mb-1">
+                {errors.apiError.message}
+              </div>
+            )}
+            {renderInput({
+              name: "username",
+              label: "Username",
+              customClass: "col s12",
+              placeholder: "Enter Username",
+              data: user["username"],
+              error: errors.formErrors["username"],
+              onChange: (e) => handleChange(e),
+            })}
+            {renderInput({
+              name: "password",
+              label: "Password",
+              customClass: "col s12",
+              placeholder: "Enter Password",
+              data: user["password"],
+              error: errors.formErrors["password"],
+              onChange: (e) => handleChange(e),
+              type: "password",
+            })}
+            {renderInput({
+              name: "firstname",
+              label: "First Name",
+              customClass: "col s6",
+              placeholder: "Enter First Name",
+              data: user["firstname"],
+              error: errors.formErrors["firstname"],
+              onChange: (e) => handleChange(e),
+            })}
+            {renderInput({
+              name: "lastname",
+              label: "Last Name",
+              customClass: "col s6",
+              placeholder: "Enter Last Name",
+              data: user["lastname"],
+              error: errors.formErrors["lastname"],
+              onChange: (e) => handleChange(e),
+            })}
 
-      <div className="row">
-        <form className="col s8">
-          {errors.apiError.message && (
-            <div className="statusBox red white-text mb-1">
-              {errors.apiError.message}
-            </div>
-          )}
-          {renderInput({
-            name: "username",
-            label: "Username",
-            customClass: "col s12",
-            placeholder: "Enter Username",
-            data: user["username"],
-            error: errors.formErrors["username"],
-            onChange: (e) => handleChange(e),
-          })}
-          {renderInput({
-            name: "password",
-            label: "Password",
-            customClass: "col s12",
-            placeholder: "Enter Password",
-            data: user["password"],
-            error: errors.formErrors["password"],
-            onChange: (e) => handleChange(e),
-            type: "password",
-          })}
-          {renderInput({
-            name: "firstname",
-            label: "First Name",
-            customClass: "col s6",
-            placeholder: "Enter First Name",
-            data: user["firstname"],
-            error: errors.formErrors["firstname"],
-            onChange: (e) => handleChange(e),
-          })}
-          {renderInput({
-            name: "lastname",
-            label: "Last Name",
-            customClass: "col s6",
-            placeholder: "Enter Last Name",
-            data: user["lastname"],
-            error: errors.formErrors["lastname"],
-            onChange: (e) => handleChange(e),
-          })}
-
-          {renderRadioButton("admin", "Admin", user.isAdmin, (e) =>
-            handleChangeRadio(e)
-          )}
-          {renderRadioButton("cashier", "Cashier", !user.isAdmin, (e) =>
-            handleChangeRadio(e)
-          )}
-          {renderButton("Submit", (e) => handleSubmit(e))}
-          {renderButton(
-            "Cancel",
-            (e) => cancel(e),
-            "green lighten-5 black-text ml-1"
-          )}
-        </form>
-      </div>
+            {renderRadioButton("admin", "Admin", user.isAdmin, (e) =>
+              handleChangeRadio(e)
+            )}
+            {renderRadioButton("cashier", "Cashier", !user.isAdmin, (e) =>
+              handleChangeRadio(e)
+            )}
+            {renderButton("Submit", (e) => handleSubmit(e))}
+            {renderButton(
+              "Cancel",
+              (e) => cancel(e),
+              "green lighten-5 black-text ml-1"
+            )}
+          </form>
+        </div>
+      )}
     </Fragment>
   );
 };
