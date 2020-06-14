@@ -29,7 +29,7 @@ const Users = () => {
   useEffect(() => {
     dispatch(loadUsers());
     dispatch(setSuccess(false));
-  });
+  }, []);
 
   const handleDelete = (userId) => {
     dispatch(deleteUser({ _id: userId }));

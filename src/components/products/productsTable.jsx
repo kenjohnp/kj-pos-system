@@ -5,7 +5,7 @@ import Loader from "../common/loader";
 import FloatingButton from "../common/floatingButton";
 
 const ProductsTable = ({ products, sortColumn, onSort, onDelete, onEdit }) => {
-  const { loading } = useSelector((state) => state.entities.categories);
+  const { loading } = useSelector((state) => state.entities.products);
   const columns = [
     {
       path: "barcode",

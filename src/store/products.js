@@ -33,7 +33,8 @@ const slice = createSlice({
       products.lastFetch = Date.now();
     },
     productsRequestFailed: (products, action) => {
-      products.errors.apiError = action.payload;
+      console.log("failed");
+      products.errors.apiError = action.payload.errors;
       products.loading = false;
     },
     productAdded: (products, action) => {
@@ -49,8 +50,6 @@ const slice = createSlice({
       const { _id } = action.payload;
 
       const index = products.list.findIndex((product) => product._id === _id);
-
-      console.log(index);
 
       if (index > -1) {
         for (let key in action.payload)

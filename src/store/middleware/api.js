@@ -23,8 +23,15 @@ const api = ({ dispatch }) => (next) => async (action) => {
     //Specific
     if (onSuccess) dispatch({ type: onSuccess, payload: response.data });
   } catch (error) {
+    if (!error.response)
+      error.response = {
+        data: error.message,
+        status: 500,
+      };
+
     //General
     dispatch(actions.apiCallFailed(error.message));
+
     //Specific
     if (onError)
       dispatch({

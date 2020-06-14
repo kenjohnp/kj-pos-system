@@ -10,7 +10,7 @@ import Search from "../common/search";
 
 const Products = () => {
   const dispatch = useDispatch();
-  const { list: products, loading } = useSelector(
+  const { list: products, loading, errors } = useSelector(
     (state) => state.entities.products
   );
   const [sortColumn, setSortColumn] = useState({
@@ -70,18 +70,26 @@ const Products = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
-      <ProductsTable
-        products={data}
-        sortColumn={sortColumn}
-        onSort={(sortColumn) => handleSort(sortColumn)}
-        onDelete={handleDelete}
-      />
-      <Pagination
-        itemsCount={totalCount}
-        pageSize={pageSize}
-        currentPage={currentPage}
-        onPageChange={(currentPage) => handlePageChange(currentPage)}
-      />
+      {errors.apiError.message ? (
+        <div className="red white-text center statusBox">
+          {errors.apiError.message}
+        </div>
+      ) : (
+        <Fragment>
+          <ProductsTable
+            products={data}
+            sortColumn={sortColumn}
+            onSort={(sortColumn) => handleSort(sortColumn)}
+            onDelete={handleDelete}
+          />
+          <Pagination
+            itemsCount={totalCount}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={(currentPage) => handlePageChange(currentPage)}
+          />
+        </Fragment>
+      )}
     </Fragment>
   );
 };
