@@ -52,8 +52,14 @@ const slice = createSlice({
       if (index > -1)
         for (let key in action.payload)
           users.list[index][key] = action.payload[key];
-
+      users.loading = false;
       users.success = true;
+    },
+    userAdminToggled: (users, action) => {
+      const { _id } = action.payload;
+      const index = users.list.findIndex((user) => user._id === _id);
+
+      users.list[index].isAdmin = action.payload.isAdmin;
     },
     setUserErrors: (users, action) => {
       users.errors.formErrors = action.payload.errors;
@@ -78,11 +84,11 @@ export const {
   userAdded,
   userRemoved,
   userReceived,
-  userAdminToggled,
   usersRequested,
   usersReceived,
   usersRequestFailed,
   userUpdated,
+  userAdminToggled,
   setUserErrors,
   setApiError,
   errorsCleared,
@@ -128,14 +134,27 @@ export const deleteUser = (user) =>
     onError: setApiError.type,
   });
 
-export const updateUser = (user) =>
-  apiCallBegan({
+export const updateUser = (user) => {
+  let onSuccess = null;
+  let onStart = null;
+
+  if (user.type === "toggleAdmin") {
+    onSuccess = userAdminToggled.type;
+    onStart = null;
+  } else {
+    onSuccess = userUpdated.type;
+    onStart = usersRequested.type;
+  }
+
+  return apiCallBegan({
     url: `${url}/${user._id}`,
     method: "put",
     data: user,
-    onSuccess: userUpdated.type,
+    onStart: onStart,
+    onSuccess: onSuccess,
     onError: setApiError.type,
   });
+};
 
 export const getUser = (user) =>
   apiCallBegan({

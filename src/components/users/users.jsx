@@ -13,6 +13,7 @@ import {
   setSuccess,
   clearErrors,
 } from "../../store/users";
+import Modal from "../common/modal";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const Users = () => {
   };
 
   const handleToggleAdmin = (id, isAdmin) => {
-    dispatch(updateUser({ _id: id, isAdmin: !isAdmin }));
+    dispatch(updateUser({ _id: id, isAdmin: !isAdmin, type: "toggleAdmin" }));
   };
 
   const handleChange = (e) => {
@@ -67,6 +68,7 @@ const Users = () => {
 
   return (
     <Fragment>
+      <Modal />
       <PageTitle title="Users" />
       {errors.apiError.message && (
         <div className="red white-text center statusBox">

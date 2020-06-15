@@ -3,13 +3,21 @@ import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
 import validate from "../../utils/validate";
 import { useSelector, useDispatch } from "react-redux";
-import { updateUser, setUserErrors, clearErrors } from "../../store/users";
+import {
+  updateUser,
+  setUserErrors,
+  clearErrors,
+  setSuccess,
+} from "../../store/users";
 import { renderInput, renderButton } from "../common/renderForms";
 import PageTitle from "../common/pageTitle";
+import Loader from "../common/loader";
 
 const UserResetPassword = ({ match }) => {
   const dispatch = useDispatch();
-  const { errors, success } = useSelector((state) => state.entities.users);
+  const { errors, success, loading } = useSelector(
+    (state) => state.entities.users
+  );
 
   const [user, setUser] = useState({ password: "" });
   const [redirectToUsers, setRedirectToUsers] = useState(false);
@@ -20,6 +28,7 @@ const UserResetPassword = ({ match }) => {
 
   useEffect(() => {
     return () => {
+      dispatch(setSuccess(false));
       dispatch(clearErrors());
     };
   }, []);
@@ -49,24 +58,33 @@ const UserResetPassword = ({ match }) => {
     <Fragment>
       {(redirectToUsers || success) && <Redirect to="/users" />}
       <PageTitle title="Reset Password" />
-      <form className="col s8">
-        {renderInput({
-          name: "password",
-          label: "New Password",
-          customClass: "col s6",
-          placeholder: "Enter New Password",
-          data: user["password"],
-          error: errors.formErrors["password"],
-          type: "password",
-          onChange: (e) => handleChange(e),
-        })}
-        {renderButton("Submit", (e) => handleSubmit(e))}
-        {renderButton(
-          "Cancel",
-          () => cancel(),
-          "green lighten-5 black-text ml-1"
-        )}
-      </form>
+      {errors.apiError.message && (
+        <div className="statusBox red white-text mb-1">
+          {errors.apiError.message}
+        </div>
+      )}
+      {loading ? (
+        <Loader />
+      ) : (
+        <form className="col s8">
+          {renderInput({
+            name: "password",
+            label: "New Password",
+            customClass: "col s6",
+            placeholder: "Enter New Password",
+            data: user["password"],
+            error: errors.formErrors["password"],
+            type: "password",
+            onChange: (e) => handleChange(e),
+          })}
+          {renderButton("Submit", (e) => handleSubmit(e))}
+          {renderButton(
+            "Cancel",
+            () => cancel(),
+            "green lighten-5 black-text ml-1"
+          )}
+        </form>
+      )}
     </Fragment>
   );
 };

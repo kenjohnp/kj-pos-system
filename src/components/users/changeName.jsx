@@ -10,6 +10,8 @@ import {
 import validate from "../../utils/validate";
 import Joi from "joi-browser";
 import { renderInput, renderButton } from "../common/renderForms";
+import PageTitle from "../common/pageTitle";
+import Loader from "../common/loader";
 
 const ChangeName = ({ match }) => {
   const dispatch = useDispatch();
@@ -36,7 +38,7 @@ const ChangeName = ({ match }) => {
 
   useEffect(() => {
     setUser(selectedUser);
-  }, [loading]);
+  }, [selectedUser]);
 
   const handleChange = ({ currentTarget: input }) => {
     const newUser = { ...user };
@@ -66,10 +68,18 @@ const ChangeName = ({ match }) => {
   };
 
   return (
-    !loading && (
-      <Fragment>
-        {(redirectToUsers || success) && <Redirect to="/users" />}
-        <h4 className="green-text left-align">Change Name</h4>
+    <Fragment>
+      {(redirectToUsers || success) && <Redirect to="/users" />}
+      <PageTitle title="Change Name" />
+      {errors.apiError.message && (
+        <div className="statusBox red white-text mb-1">
+          {errors.apiError.message}
+        </div>
+      )}
+      {console.log("loading:", loading)};
+      {loading ? (
+        <Loader />
+      ) : (
         <form className="col s8">
           {renderInput({
             name: "firstname",
@@ -96,8 +106,8 @@ const ChangeName = ({ match }) => {
             "green lighten-5 black-text ml-1"
           )}
         </form>
-      </Fragment>
-    )
+      )}
+    </Fragment>
   );
 };
 
