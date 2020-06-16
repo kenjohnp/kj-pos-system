@@ -27,6 +27,8 @@ const Users = () => {
     pageSize: 7,
     currentPage: 1,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     dispatch(loadUsers());
@@ -37,7 +39,19 @@ const Users = () => {
   }, []);
 
   const handleDelete = (userId) => {
-    dispatch(deleteUser({ _id: userId }));
+    setIsModalOpen(true);
+    setSelectedUser(userId);
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(deleteUser({ _id: selectedUser }));
+    setSelectedUser(null);
+    setIsModalOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setSelectedUser(null);
+    setIsModalOpen(false);
   };
 
   const handleSort = (sortColumn) => {
@@ -68,7 +82,13 @@ const Users = () => {
 
   return (
     <Fragment>
-      <Modal />
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={handleModalClose}
+        onClose={handleModalClose}
+        onSubmit={handleConfirmDelete}
+      />
+
       <PageTitle title="Users" />
       {errors.apiError.message && (
         <div className="red white-text center statusBox">

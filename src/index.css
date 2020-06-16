@@ -21,6 +21,10 @@ code {
   padding: 0 !important;
 }
 
+.p-1 {
+  padding: 0.3rem !important;
+}
+
 .m-1 {
   margin: 1.5rem;
 }
@@ -64,4 +68,34 @@ td {
 .statusBox {
   padding: 0.5rem;
   border-radius: 2px;
+}
+
+.modal-header {
+  padding: 15px;
+  border-radius: inherit;
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+
+.modal-header {
+  padding: 10px;
+  text-align: center;
+}
+
+.modal-content {
+  display: flex;
+  padding: 1rem;
+  justify-content: center;
+  align-items: center;
 }
