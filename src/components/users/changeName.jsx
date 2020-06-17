@@ -76,10 +76,9 @@ const ChangeName = ({ match }) => {
           {errors.apiError.message}
         </div>
       )}
-      {console.log("loading:", loading)};
-      {loading ? (
-        <Loader />
-      ) : (
+      {console.log("loading:", loading)}
+      {loading && <Loader className="left-align" />}
+      <div className="row">
         <form className="col s8">
           {renderInput({
             name: "firstname",
@@ -107,7 +106,7 @@ const ChangeName = ({ match }) => {
             "green lighten-5 black-text ml-1"
           )}
         </form>
-      )}
+      </div>
     </Fragment>
   );
 };

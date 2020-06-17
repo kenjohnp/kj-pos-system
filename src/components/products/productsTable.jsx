@@ -4,8 +4,7 @@ import Table from "../common/table";
 import Loader from "../common/loader";
 import FloatingButton from "../common/floatingButton";
 
-const ProductsTable = ({ products, sortColumn, onSort, onDelete, onEdit }) => {
-  const { loading } = useSelector((state) => state.entities.products);
+const ProductsTable = ({ products, sortColumn, onSort, onDelete }) => {
   const columns = [
     {
       path: "barcode",
@@ -46,9 +45,7 @@ const ProductsTable = ({ products, sortColumn, onSort, onDelete, onEdit }) => {
     },
   ];
 
-  return loading ? (
-    <Loader />
-  ) : (
+  return (
     <Table
       columns={columns}
       data={products}

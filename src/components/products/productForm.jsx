@@ -6,18 +6,20 @@ import validate from "../../utils/validate";
 import PageTitle from "../common/pageTitle";
 import { renderInput, renderButton } from "../common/renderForms";
 import Select from "../common/select";
+import Loader from "../common/loader";
 import {
   setProductErrors,
   addProduct,
   getProduct,
   updateProduct,
   clearErrors,
+  clearSelectedProduct,
 } from "../../store/products";
 import { loadCategories } from "../../store/categories";
 
 const ProductForm = ({ match }) => {
   const dispatch = useDispatch();
-  const { success, errors, selectedProduct } = useSelector(
+  const { success, errors, selectedProduct, loading } = useSelector(
     (state) => state.entities.products
   );
   const { list: categories } = useSelector(
@@ -45,11 +47,13 @@ const ProductForm = ({ match }) => {
 
   useEffect(() => {
     dispatch(loadCategories());
+
     if (match.params.id !== "new")
       dispatch(getProduct({ _id: match.params.id }));
 
     return () => {
       dispatch(clearErrors());
+      dispatch(clearSelectedProduct());
     };
   }, []);
 
@@ -118,8 +122,9 @@ const ProductForm = ({ match }) => {
     <Fragment>
       {(redirectToProducts || success) && <Redirect to="/products" />}
       <PageTitle
-        title={!match.params.id === "new" ? "New Product" : "Edit Product"}
+        title={match.params.id === "new" ? "New Product" : "Edit Product"}
       />
+      {loading && <Loader className="left-align" />}
       <div className="row">
         <form className="col s8">
           {errors.apiError.message && (
@@ -135,6 +140,7 @@ const ProductForm = ({ match }) => {
             data: product["barcode"],
             error: errors.formErrors["barcode"],
             onChange: (e) => handleChange(e),
+            autoFocus: true,
           })}
           {renderInput({
             name: "description",

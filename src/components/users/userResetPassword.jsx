@@ -63,9 +63,8 @@ const UserResetPassword = ({ match }) => {
           {errors.apiError.message}
         </div>
       )}
-      {loading ? (
-        <Loader />
-      ) : (
+      {loading && <Loader className="left-align" />}
+      <div className="row">
         <form className="col s8">
           {renderInput({
             name: "password",
@@ -85,7 +84,7 @@ const UserResetPassword = ({ match }) => {
             "green lighten-5 black-text ml-1"
           )}
         </form>
-      )}
+      </div>
     </Fragment>
   );
 };

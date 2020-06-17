@@ -31,7 +31,7 @@ const Categories = () => {
     currentPage: 1,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedCategory, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     dispatch(loadCategories());
@@ -50,17 +50,17 @@ const Categories = () => {
 
   const handleDelete = (categoryId) => {
     setIsModalOpen(true);
-    setSelectedUser(categoryId);
+    setSelectedProduct(categoryId);
   };
 
   const handleConfirmDelete = () => {
-    dispatch(removeCategory({ _id: selectedUser }));
-    setSelectedUser(null);
+    dispatch(removeCategory({ _id: selectedCategory }));
+    setSelectedProduct(null);
     setIsModalOpen(false);
   };
 
   const handleModalClose = () => {
-    setSelectedUser(null);
+    setSelectedProduct(null);
     setIsModalOpen(false);
   };
 

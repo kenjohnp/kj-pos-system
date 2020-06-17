@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { apiCallBegan } from "./api";
 import moment from "moment";
+import { categoriesRequested } from "./categories";
 
 const slice = createSlice({
   name: "products",
@@ -26,6 +27,7 @@ const slice = createSlice({
     },
     productReceived: (products, action) => {
       products.selectedProduct = action.payload;
+      products.loading = false;
     },
     productsReceived: (products, action) => {
       products.list = action.payload;
@@ -39,11 +41,13 @@ const slice = createSlice({
     productAdded: (products, action) => {
       products.list.push(action.payload);
       products.success = true;
+      products.loading = false;
     },
     productRemoved: (products, action) => {
       products.list = products.list.filter(
         (product) => product._id !== action.payload._id
       );
+      products.loading = false;
     },
     productUpdated: (products, action) => {
       const { _id } = action.payload;
@@ -55,6 +59,7 @@ const slice = createSlice({
           products.list[index][key] = action.payload[key];
 
       products.success = true;
+      products.loading = false;
     },
     setProductErrors: (products, action) => {
       products.errors.formErrors = action.payload.errors;
@@ -65,8 +70,18 @@ const slice = createSlice({
         apiError: {},
       };
     },
+    selectedProductCleared: (products, action) => {
+      products.selectedProduct = {
+        description: "",
+        barcode: "",
+        category: "",
+        price: 0,
+        inStock: 0,
+      };
+    },
     setApiError: (products, action) => {
       products.errors.apiError = action.payload.errors;
+      products.loading = false;
     },
     setSuccess: (products, action) => {
       products.success = action.payload;
@@ -84,6 +99,7 @@ export const {
   productRemoved,
   setProductErrors,
   errorsCleared,
+  selectedProductCleared,
   setApiError,
   setSuccess,
 } = slice.actions;
@@ -114,6 +130,7 @@ export const addProduct = (product) =>
     url,
     method: "post",
     data: product,
+    onStart: productsRequested.type,
     onSuccess: productAdded.type,
     onError: setApiError.type,
   });
@@ -122,6 +139,7 @@ export const removeProduct = (product) =>
   apiCallBegan({
     url: `${url}/${product._id}`,
     method: "delete",
+    onStart: productsRequested.type,
     onSuccess: productRemoved.type,
     onError: setApiError.type,
   });
@@ -131,6 +149,7 @@ export const updateProduct = (product) =>
     url: `${url}/${product._id}`,
     method: "put",
     data: product,
+    onStart: productsRequested.type,
     onSuccess: productUpdated.type,
     onError: setApiError.type,
   });
@@ -144,3 +163,5 @@ export const getProduct = (product) =>
   });
 
 export const clearErrors = () => (dispatch) => dispatch(errorsCleared());
+export const clearSelectedProduct = () => (dispatch) =>
+  dispatch(selectedProductCleared());

@@ -46,9 +46,8 @@ const AddCategory = () => {
     <Fragment>
       {(redirect || success) && <Redirect to="/categories" />}
       <PageTitle title="Add Category" />
-      {loading ? (
-        <Loader />
-      ) : (
+      {loading && <Loader className="left-align" />}
+      <div className="row">
         <form className="col s8">
           {errors.apiError.message && (
             <div className="statusBox red white-text mb-1">
@@ -67,7 +66,7 @@ const AddCategory = () => {
           {renderButton("Submit", (e) => handleSubmit(e))}
           {renderButton("Cancel", cancel, "green lighten-5 black-text ml-1")}
         </form>
-      )}
+      </div>
     </Fragment>
   );
 };

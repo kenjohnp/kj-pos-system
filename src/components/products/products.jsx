@@ -1,12 +1,19 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { loadProducts, setSuccess, removeProduct } from "../../store/products";
+import {
+  loadProducts,
+  setSuccess,
+  removeProduct,
+  clearErrors,
+} from "../../store/products";
 import getPagedData from "../../utils/getPagedData";
 import PageTitle from "../common/pageTitle";
 import ProductsTable from "./productsTable";
 import Pagination from "../common/pagination";
 import Search from "../common/search";
+import Loader from "../common/loader";
+import ConfirmModal from "../common/confirmModal";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -22,11 +29,17 @@ const Products = () => {
     pageSize: 7,
     currentPage: 1,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     dispatch(loadProducts());
     dispatch(setSuccess(false));
-  }, [products]);
+
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, []);
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
@@ -40,7 +53,19 @@ const Products = () => {
   };
 
   const handleDelete = (id) => {
-    dispatch(removeProduct({ _id: id }));
+    setIsModalOpen(true);
+    setSelectedProduct(id);
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(removeProduct({ _id: selectedProduct }));
+    setSelectedProduct(null);
+    setIsModalOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
   };
 
   const handlePageChange = (currentPage) => {
@@ -61,7 +86,21 @@ const Products = () => {
 
   return (
     <Fragment>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onRequestClose={handleModalClose}
+        onClose={handleModalClose}
+        onSubmit={handleConfirmDelete}
+        submitColor="red"
+        submitLabel="DELETE"
+        headerLabel="Confirm Delete"
+      />
       <PageTitle title="Products" />
+      {errors.apiError.message && (
+        <div className="red white-text center statusBox">
+          {errors.apiError.message}
+        </div>
+      )}
       <div className="row mb-0 valign-wrapper">
         <div className="col s8">
           <Link
@@ -73,26 +112,19 @@ const Products = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
-      {errors.apiError.message ? (
-        <div className="red white-text center statusBox">
-          {errors.apiError.message}
-        </div>
-      ) : (
-        <Fragment>
-          <ProductsTable
-            products={data}
-            sortColumn={sortColumn}
-            onSort={(sortColumn) => handleSort(sortColumn)}
-            onDelete={handleDelete}
-          />
-          <Pagination
-            itemsCount={totalCount}
-            pageSize={pageSize}
-            currentPage={currentPage}
-            onPageChange={(currentPage) => handlePageChange(currentPage)}
-          />
-        </Fragment>
-      )}
+      {loading && <Loader />}
+      <ProductsTable
+        products={data}
+        sortColumn={sortColumn}
+        onSort={(sortColumn) => handleSort(sortColumn)}
+        onDelete={handleDelete}
+      />
+      <Pagination
+        itemsCount={totalCount}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        onPageChange={(currentPage) => handlePageChange(currentPage)}
+      />
     </Fragment>
   );
 };
