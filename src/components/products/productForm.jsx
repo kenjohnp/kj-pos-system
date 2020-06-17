@@ -55,12 +55,13 @@ const ProductForm = ({ match }) => {
 
   useEffect(() => {
     const product = { ...selectedProduct };
-    const { _id, name } = product.category;
-    product.category = {
-      value: _id,
-      label: name,
-    };
-
+    if (product.category) {
+      const { _id, name } = product.category;
+      product.category = {
+        value: _id,
+        label: name,
+      };
+    }
     setProduct(product);
   }, [selectedProduct]);
 

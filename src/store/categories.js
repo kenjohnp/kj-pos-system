@@ -34,6 +34,8 @@ const slice = createSlice({
       categories.list = categories.list.filter(
         (category) => category._id !== action.payload._id
       );
+
+      categories.loading = false;
     },
     categoryUpdated: (categories, action) => {
       const { _id } = action.payload;
@@ -43,6 +45,8 @@ const slice = createSlice({
 
       for (let key in action.payload)
         categories.list[index][key] = action.payload[key];
+
+      categories.loading = false;
     },
     setUserErrors: (categories, action) => {
       categories.errors.formErrors = action.payload.errors;
@@ -50,6 +54,12 @@ const slice = createSlice({
     setApiError: (categories, action) => {
       categories.errors.apiError = action.payload.errors;
       categories.loading = false;
+    },
+    errorsCleared: (categories, action) => {
+      categories.errors = {
+        apiError: {},
+        formErrors: {},
+      };
     },
     setSuccess: (categories, action) => {
       categories.success = action.payload;
@@ -66,6 +76,7 @@ export const {
   categoriesRequestFailed,
   setUserErrors,
   setApiError,
+  errorsCleared,
   setSuccess,
 } = slice.actions;
 
@@ -118,3 +129,5 @@ export const updateCategory = (category) =>
     onSuccess: categoryUpdated.type,
     onError: setApiError.type,
   });
+
+export const clearErrors = () => (dispatch) => dispatch(errorsCleared());

@@ -44,6 +44,7 @@ const slice = createSlice({
     },
     userRemoved: (users, action) => {
       users.list = users.list.filter((user) => user._id !== action.payload._id);
+      users.loading = false;
     },
     userUpdated: (users, action) => {
       const { _id } = action.payload;
@@ -130,6 +131,7 @@ export const deleteUser = (user) =>
   apiCallBegan({
     url: url + "/" + user._id,
     method: "delete",
+    onStart: usersRequested.type,
     onSuccess: userRemoved.type,
     onError: setApiError.type,
   });

@@ -7,12 +7,14 @@ import {
   updateCategory,
   removeCategory,
   setSuccess,
+  clearErrors,
 } from "../../store/categories";
 import CategoriesTable from "./categoriesTable";
 import Pagination from "../common/pagination";
 import Search from "../common/search";
 import PageTitle from "../common/pageTitle";
 import Loader from "../common/loader";
+import ConfirmModal from "../common/confirmModal";
 
 const Categories = () => {
   const dispatch = useDispatch();
@@ -28,10 +30,15 @@ const Categories = () => {
     pageSize: 7,
     currentPage: 1,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     dispatch(loadCategories());
     dispatch(setSuccess(false));
+    return () => {
+      dispatch(clearErrors());
+    };
   }, []);
 
   const handleChange = ({ currentTarget: input }) => {
@@ -42,7 +49,19 @@ const Categories = () => {
   };
 
   const handleDelete = (categoryId) => {
-    dispatch(removeCategory({ _id: categoryId }));
+    setIsModalOpen(true);
+    setSelectedUser(categoryId);
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(removeCategory({ _id: selectedUser }));
+    setSelectedUser(null);
+    setIsModalOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setSelectedUser(null);
+    setIsModalOpen(false);
   };
 
   const handleEnabled = (id, enabled) => {
@@ -69,6 +88,15 @@ const Categories = () => {
 
   return (
     <Fragment>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onRequestClose={handleModalClose}
+        onClose={handleModalClose}
+        onSubmit={handleConfirmDelete}
+        submitColor="red"
+        submitLabel="DELETE"
+        headerLabel="Confirm Delete"
+      />
       <PageTitle title="Categories" />
       {errors.apiError.message && (
         <div className="red white-text center statusBox">
