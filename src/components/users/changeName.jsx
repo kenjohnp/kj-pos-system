@@ -89,6 +89,7 @@ const ChangeName = ({ match }) => {
             data: user["firstname"],
             error: errors.formErrors["firstname"],
             onChange: (e) => handleChange(e),
+            autoFocus: true,
           })}
           {renderInput({
             name: "lastname",

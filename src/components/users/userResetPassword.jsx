@@ -76,6 +76,7 @@ const UserResetPassword = ({ match }) => {
             error: errors.formErrors["password"],
             type: "password",
             onChange: (e) => handleChange(e),
+            autoFocus: true,
           })}
           {renderButton("Submit", (e) => handleSubmit(e))}
           {renderButton(

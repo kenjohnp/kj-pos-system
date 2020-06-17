@@ -42,9 +42,7 @@ const CategoriesTable = ({
     },
   ];
 
-  return loading ? (
-    <Loader />
-  ) : (
+  return (
     <Table
       columns={columns}
       data={categories}

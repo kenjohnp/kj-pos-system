@@ -101,6 +101,7 @@ const UserForm = () => {
               data: user["username"],
               error: errors.formErrors["username"],
               onChange: (e) => handleChange(e),
+              autoFocus: true,
             })}
             {renderInput({
               name: "password",

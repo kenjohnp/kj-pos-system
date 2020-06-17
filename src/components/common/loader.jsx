@@ -4,11 +4,11 @@ import LoadSpinner from "react-loader-spinner";
 const Loader = () => {
   return (
     <LoadSpinner
-      type="TailSpin"
+      type="ThreeDots"
       color="#4CAF50"
-      height={80}
-      width={80}
-      className="center-align"
+      height={40}
+      width={40}
+      className="right-align"
     />
   );
 };

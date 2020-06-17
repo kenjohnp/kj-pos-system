@@ -13,7 +13,7 @@ import {
   setSuccess,
   clearErrors,
 } from "../../store/users";
-import Modal from "../common/modal";
+import ConfirmModal from "../common/confirmModal";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -64,6 +64,9 @@ const Users = () => {
 
   const handleChange = (e) => {
     setSearchQuery(e.currentTarget.value);
+    const currentPagination = { ...pagination };
+    currentPagination.currentPage = 1;
+    setPagination(currentPagination);
   };
 
   const handlePageChange = (currentPage) => {
@@ -82,11 +85,14 @@ const Users = () => {
 
   return (
     <Fragment>
-      <Modal
+      <ConfirmModal
         isOpen={isModalOpen}
         onRequestClose={handleModalClose}
         onClose={handleModalClose}
         onSubmit={handleConfirmDelete}
+        submitColor="red"
+        submitLabel="DELETE"
+        headerLabel="Confirm Delete"
       />
 
       <PageTitle title="Users" />

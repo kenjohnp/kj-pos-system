@@ -12,10 +12,11 @@ import CategoriesTable from "./categoriesTable";
 import Pagination from "../common/pagination";
 import Search from "../common/search";
 import PageTitle from "../common/pageTitle";
+import Loader from "../common/loader";
 
 const Categories = () => {
   const dispatch = useDispatch();
-  const { list: categories, loading } = useSelector(
+  const { list: categories, errors, loading } = useSelector(
     (state) => state.entities.categories
   );
   const [sortColumn, setSortColumn] = useState({
@@ -35,6 +36,9 @@ const Categories = () => {
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
+    const currentPagination = { ...pagination };
+    currentPagination.currentPage = 1;
+    setPagination(currentPagination);
   };
 
   const handleDelete = (categoryId) => {
@@ -66,6 +70,11 @@ const Categories = () => {
   return (
     <Fragment>
       <PageTitle title="Categories" />
+      {errors.apiError.message && (
+        <div className="red white-text center statusBox">
+          {errors.apiError.message}
+        </div>
+      )}
       <div className="row mb-0 valign-wrapper">
         <div className="col s8">
           <Link
@@ -77,6 +86,7 @@ const Categories = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={(e) => handleChange(e)} />
       </div>
+      {loading && <Loader />}
       <CategoriesTable
         categories={data}
         sortColumn={sortColumn}

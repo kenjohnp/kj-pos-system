@@ -30,6 +30,9 @@ const Products = () => {
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
+    const currentPagination = { ...pagination };
+    currentPagination.currentPage = 1;
+    setPagination(currentPagination);
   };
 
   const handleSort = (sortColumn) => {

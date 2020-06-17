@@ -1,16 +1,22 @@
 import React, { Fragment, useState } from "react";
 import { Redirect } from "react-router-dom";
-import validate from "../../utils/validate";
-import { renderButton, renderInput } from "../common/renderForms";
 import { useSelector, useDispatch } from "react-redux";
-import { setUserErrors, addCategory } from "../../store/categories";
 import Joi from "joi-browser";
+import validate from "../../utils/validate";
+import { setUserErrors, addCategory } from "../../store/categories";
+import { renderButton, renderInput } from "../common/renderForms";
+import PageTitle from "../common/pageTitle";
+import Loader from "../common/loader";
 
 const AddCategory = () => {
   const dispatch = useDispatch();
-  const { errors, success } = useSelector((state) => state.entities.categories);
+  const { errors, success, loading } = useSelector(
+    (state) => state.entities.categories
+  );
 
   const [category, setCategory] = useState({ name: "" });
+  const [redirect, setRedirect] = useState(false);
+
   const schema = {
     name: Joi.string().required().label("Category Name"),
   };
@@ -32,22 +38,36 @@ const AddCategory = () => {
     dispatch(addCategory({ name: category.name, enabled: true }));
   };
 
+  const cancel = () => {
+    setRedirect(true);
+  };
+
   return (
     <Fragment>
-      {success && <Redirect to="/categories" />}
-      <h4 className="green-text left-align">Add Category</h4>
-      <form className="col s8">
-        {renderInput({
-          name: "name",
-          label: "Category Name",
-          customClass: "col s6",
-          placeholder: "Enter New Category",
-          data: category["name"],
-          error: errors.formErrors["name"],
-          onChange: (e) => handleChange(e),
-        })}
-        {renderButton("Submit", (e) => handleSubmit(e))}
-      </form>
+      {(redirect || success) && <Redirect to="/categories" />}
+      <PageTitle title="Add Category" />
+      {loading ? (
+        <Loader />
+      ) : (
+        <form className="col s8">
+          {errors.apiError.message && (
+            <div className="statusBox red white-text mb-1">
+              {errors.apiError.message}
+            </div>
+          )}
+          {renderInput({
+            name: "name",
+            label: "Category Name",
+            customClass: "col s6",
+            placeholder: "Enter New Category",
+            data: category["name"],
+            error: errors.formErrors["name"],
+            onChange: (e) => handleChange(e),
+          })}
+          {renderButton("Submit", (e) => handleSubmit(e))}
+          {renderButton("Cancel", cancel, "green lighten-5 black-text ml-1")}
+        </form>
+      )}
     </Fragment>
   );
 };

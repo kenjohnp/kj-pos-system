@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import { useSelector } from "react-redux";
-import Loader from "react-loader-spinner";
+import Loader from "../common/loader";
 import Table from "../common/table";
 
 const UsersTable = ({ users, onSort, sortColumn, onDelete, onChange }) => {
@@ -57,13 +57,7 @@ const UsersTable = ({ users, onSort, sortColumn, onDelete, onChange }) => {
   ];
 
   return loading ? (
-    <Loader
-      type="TailSpin"
-      color="#4CAF50"
-      height={80}
-      width={80}
-      className="center-align"
-    />
+    <Loader />
   ) : (
     <Table
       columns={columns}

@@ -23,6 +23,7 @@ const slice = createSlice({
       categories.lastFetch = Date.now();
     },
     categoriesRequestFailed: (categories, action) => {
+      categories.errors.apiError = action.payload.errors;
       categories.loading = false;
     },
     categoryAdded: (categories, action) => {
@@ -42,14 +43,13 @@ const slice = createSlice({
 
       for (let key in action.payload)
         categories.list[index][key] = action.payload[key];
-
-      categories.success = true;
     },
     setUserErrors: (categories, action) => {
       categories.errors.formErrors = action.payload.errors;
     },
     setApiError: (categories, action) => {
       categories.errors.apiError = action.payload.errors;
+      categories.loading = false;
     },
     setSuccess: (categories, action) => {
       categories.success = action.payload;
@@ -95,6 +95,7 @@ export const addCategory = (category) =>
     url,
     method: "post",
     data: category,
+    onStart: categoriesRequested.type,
     onSuccess: categoryAdded.type,
     onError: setApiError.type,
   });
@@ -104,6 +105,7 @@ export const removeCategory = (category) =>
     url: `${url}/${category._id}`,
     method: "delete",
     data: category,
+    onStart: categoriesRequested.type,
     onSuccess: categoryRemoved.type,
     onError: setApiError.type,
   });

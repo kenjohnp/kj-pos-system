@@ -22,13 +22,13 @@ const getPagedData = ({
 
   const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
-  const paginatedCategories = paginate(
+  const paginatedData = paginate(
     sorted,
     pagination.currentPage,
     pagination.pageSize
   );
 
-  return { totalCount: sorted.length, data: paginatedCategories };
+  return { totalCount: sorted.length, data: paginatedData };
 };
 
 export default getPagedData;

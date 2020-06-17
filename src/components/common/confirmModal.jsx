@@ -2,7 +2,15 @@ import React from "react";
 import ReactModal from "react-modal";
 
 ReactModal.setAppElement("#root");
-const Modal = ({ isOpen, onRequestClose, onClose, onSubmit }) => {
+const ConfirmModal = ({
+  isOpen,
+  onRequestClose,
+  onClose,
+  onSubmit,
+  submitColor,
+  submitLabel,
+  headerLabel,
+}) => {
   const customStyles = {
     overlay: {
       zIndex: 999,
@@ -25,10 +33,13 @@ const Modal = ({ isOpen, onRequestClose, onClose, onSubmit }) => {
       onRequestClose={onRequestClose}
       style={customStyles}
     >
-      <div className="modal-header green white-text">DELETE</div>
+      <div className="modal-header green white-text">{headerLabel}</div>
       <div className="modal-content">
-        <button className="waves-effect waves-light btn red" onClick={onSubmit}>
-          DELETE
+        <button
+          className={`waves-effect waves-light btn ${submitColor}`}
+          onClick={onSubmit}
+        >
+          {submitLabel}
         </button>
         <button
           className="waves-effect waves-light btn lighten-5 ml-2"
@@ -41,4 +52,4 @@ const Modal = ({ isOpen, onRequestClose, onClose, onSubmit }) => {
   );
 };
 
-export default Modal;
+export default ConfirmModal;
