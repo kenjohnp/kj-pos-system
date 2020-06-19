@@ -1,7 +1,5 @@
 import React, { Fragment } from "react";
-import { useSelector } from "react-redux";
 import Table from "../common/table";
-import Loader from "../common/loader";
 import FloatingButton from "../common/floatingButton";
 
 const ProductsTable = ({ products, sortColumn, onSort, onDelete }) => {

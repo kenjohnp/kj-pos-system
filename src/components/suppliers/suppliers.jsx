@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import {
-  loadProducts,
-  setSuccess,
-  removeProduct,
-  clearErrors,
-} from "../../store/products";
 import getPagedData from "../../utils/getPagedData";
+import { loadSuppliers } from "../../store/suppliers";
 import PageTitle from "../common/pageTitle";
-import ProductsTable from "./productsTable";
 import Pagination from "../common/pagination";
-import Search from "../common/search";
 import Loader from "../common/loader";
-import ConfirmModal from "../common/confirmModal";
+import Search from "../common/search";
+import SuppliersTable from "./suppliersTable";
 
-const Products = () => {
+const Suppliers = () => {
   const dispatch = useDispatch();
-  const { list: products, loading, errors } = useSelector(
-    (state) => state.entities.products
+  const { list: suppliers, loading, errors } = useSelector(
+    (state) => state.entities.suppliers
   );
   const [sortColumn, setSortColumn] = useState({
-    path: "description",
+    path: "name",
     order: "asc",
   });
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,43 +23,21 @@ const Products = () => {
     pageSize: 7,
     currentPage: 1,
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    dispatch(loadProducts());
-    dispatch(setSuccess(false));
+    dispatch(loadSuppliers());
+  });
 
-    return () => {
-      dispatch(clearErrors());
-    };
-  }, []);
+  const handleSort = (sortColumn) => {
+    setSortColumn(sortColumn);
+  };
+  const handleDelete = () => {};
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
     const currentPagination = { ...pagination };
     currentPagination.currentPage = 1;
     setPagination(currentPagination);
-  };
-
-  const handleSort = (sortColumn) => {
-    setSortColumn(sortColumn);
-  };
-
-  const handleDelete = (id) => {
-    setIsModalOpen(true);
-    setSelectedProduct(id);
-  };
-
-  const handleConfirmDelete = () => {
-    dispatch(removeProduct({ _id: selectedProduct }));
-    setSelectedProduct(null);
-    setIsModalOpen(false);
-  };
-
-  const handleModalClose = () => {
-    setSelectedProduct(null);
-    setIsModalOpen(false);
   };
 
   const handlePageChange = (currentPage) => {
@@ -75,9 +47,9 @@ const Products = () => {
   };
 
   const { totalCount, data } = getPagedData({
-    data: products,
+    data: suppliers,
     searchQuery,
-    searchFields: ["description", "barcode"],
+    searchFields: ["name", "contactPerson"],
     sortColumn,
     pagination,
   });
@@ -86,16 +58,7 @@ const Products = () => {
 
   return (
     <>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onRequestClose={handleModalClose}
-        onClose={handleModalClose}
-        onSubmit={handleConfirmDelete}
-        submitColor="red"
-        submitLabel="DELETE"
-        headerLabel="Confirm Delete"
-      />
-      <PageTitle title="Products" />
+      <PageTitle title="Suppliers" />
       {errors.apiError.message && (
         <div className="red white-text center statusBox">
           {errors.apiError.message}
@@ -105,7 +68,7 @@ const Products = () => {
         <div className="col s8">
           <Link
             className="btn-floating btn-large waves-effect waves-light green left-align"
-            to="/products/new"
+            to="/suppliers/new"
           >
             <i className="material-icons">add</i>
           </Link>
@@ -113,10 +76,10 @@ const Products = () => {
         <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
       {loading && <Loader />}
-      <ProductsTable
-        products={data}
+      <SuppliersTable
+        suppliers={data}
         sortColumn={sortColumn}
-        onSort={(sortColumn) => handleSort(sortColumn)}
+        onSort={handleSort}
         onDelete={handleDelete}
       />
       <Pagination
@@ -129,4 +92,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default Suppliers;

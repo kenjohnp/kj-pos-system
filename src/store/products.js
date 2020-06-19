@@ -20,6 +20,7 @@ const slice = createSlice({
       apiError: {},
       formErrors: {},
     },
+    success: false,
   },
   reducers: {
     productsRequested: (products, action) => {
