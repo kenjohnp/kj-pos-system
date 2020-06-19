@@ -29,7 +29,7 @@ const slice = createSlice({
     },
     supplierAdded: (suppliers, action) => {
       suppliers.list.push(action.payload);
-      suppliers.success = false;
+      suppliers.success = true;
       suppliers.loading = false;
     },
     supplierRemoved: (suppliers, action) => {

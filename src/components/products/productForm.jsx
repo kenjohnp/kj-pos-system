@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
@@ -119,7 +119,7 @@ const ProductForm = ({ match }) => {
   const options = categories.map((c) => ({ label: c.name, value: c._id }));
 
   return (
-    <Fragment>
+    <>
       {(redirectToProducts || success) && <Redirect to="/products" />}
       <PageTitle
         title={match.params.id === "new" ? "New Product" : "Edit Product"}
@@ -188,7 +188,7 @@ const ProductForm = ({ match }) => {
           )}
         </form>
       </div>
-    </Fragment>
+    </>
   );
 };
 

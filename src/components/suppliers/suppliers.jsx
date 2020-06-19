@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import getPagedData from "../../utils/getPagedData";
-import { loadSuppliers } from "../../store/suppliers";
+import { loadSuppliers, clearErrors } from "../../store/suppliers";
 import PageTitle from "../common/pageTitle";
 import Pagination from "../common/pagination";
 import Loader from "../common/loader";
@@ -26,7 +26,10 @@ const Suppliers = () => {
 
   useEffect(() => {
     dispatch(loadSuppliers());
-  });
+    return () => {
+      dispatch(clearErrors());
+    };
+  }, []);
 
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);

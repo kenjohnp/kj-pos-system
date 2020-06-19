@@ -12,6 +12,7 @@ import AddCategory from "./components/categories/addCategory";
 import Products from "./components/products/products";
 import ProductForm from "./components/products/productForm";
 import Suppliers from "./components/suppliers/suppliers";
+import SupplierForm from "./components/suppliers/supplierForm";
 import Login from "./components/login";
 import Logout from "./components/common/logout";
 import { Route, Switch, Redirect } from "react-router-dom";
@@ -46,6 +47,7 @@ function App() {
             <ProtectedRoute path="/categories" component={Categories} />
             <ProtectedRoute path="/products/:id" component={ProductForm} />
             <ProtectedRoute path="/products" component={Products} />
+            <ProtectedRoute path="/suppliers/:id" component={SupplierForm} />
             <ProtectedRoute path="/suppliers" component={Suppliers} />
             <ProtectedRoute path="/" exact component={Users} />
           </Switch>
