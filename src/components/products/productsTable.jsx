@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import Table from "../common/table";
 import FloatingButton from "../common/floatingButton";
 
@@ -27,7 +27,7 @@ const ProductsTable = ({ products, sortColumn, onSort, onDelete }) => {
     {
       key: "options",
       content: (category) => (
-        <Fragment>
+        <>
           <FloatingButton
             to={`/products/${category._id}`}
             icon="edit"
@@ -38,7 +38,7 @@ const ProductsTable = ({ products, sortColumn, onSort, onDelete }) => {
             icon="delete"
             customClass="red ml-1"
           />
-        </Fragment>
+        </>
       ),
     },
   ];

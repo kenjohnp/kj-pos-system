@@ -1,11 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { apiCallBegan } from "./api";
 import moment from "moment";
+import { productsRequested } from "./products";
 
 const slice = createSlice({
   name: "suppliers",
   initialState: {
     list: [],
+    selectedSupplier: {
+      name: "",
+      address: "",
+      contactPerson: "",
+      contactNumber: "",
+      fax: "",
+      email: "",
+    },
     loading: false,
     lastFetch: null,
     errors: {
@@ -17,6 +26,10 @@ const slice = createSlice({
   reducers: {
     suppliersRequested: (suppliers, action) => {
       suppliers.loading = true;
+    },
+    supplierReceived: (suppliers, action) => {
+      suppliers.selectedSupplier = action.payload;
+      suppliers.loading = false;
     },
     suppliersReceived: (suppliers, action) => {
       suppliers.list = action.payload;
@@ -64,6 +77,16 @@ const slice = createSlice({
       suppliers.errors.apiError = action.payload.errors;
       suppliers.loading = false;
     },
+    selectedSupplierCleared: (suppliers, action) => {
+      suppliers.selectedSupplier = {
+        name: "",
+        address: "",
+        contactPerson: "",
+        contactNumber: "",
+        fax: "",
+        email: "",
+      };
+    },
     setSuccess: (suppliers, action) => {
       suppliers.success = action.payload;
     },
@@ -72,6 +95,7 @@ const slice = createSlice({
 
 export const {
   suppliersRequested,
+  supplierReceived,
   suppliersReceived,
   suppliersRequestFailed,
   supplierAdded,
@@ -80,6 +104,7 @@ export const {
   setSupplierErrors,
   errorsCleared,
   setApiError,
+  selectedSupplierCleared,
   setSuccess,
 } = slice.actions;
 
@@ -129,6 +154,18 @@ export const updateSupplier = (supplier) =>
     method: "put",
     data: supplier,
     onStart: suppliersRequested.type,
+    onSuccess: supplierUpdated.type,
+    onError: setApiError.type,
+  });
+
+export const getSupplier = (supplier) =>
+  apiCallBegan({
+    url: `${url}/${supplier._id}`,
+    onStart: suppliersRequested.type,
+    onSuccess: supplierReceived.type,
+    onError: setApiError.type,
   });
 
 export const clearErrors = () => (dispatch) => dispatch(errorsCleared());
+export const clearSelectedSupplier = () => (dispatch) =>
+  dispatch(selectedSupplierCleared());

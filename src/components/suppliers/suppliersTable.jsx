@@ -1,5 +1,6 @@
 import React from "react";
 import Table from "../common/table";
+import FloatingButton from "../common/floatingButton";
 
 const SuppliersTable = ({ suppliers, sortColumn, onSort, onDelete }) => {
   const columns = [
@@ -26,6 +27,23 @@ const SuppliersTable = ({ suppliers, sortColumn, onSort, onDelete }) => {
     {
       path: "email",
       label: "Email",
+    },
+    {
+      key: "options",
+      content: (supplier) => (
+        <>
+          <FloatingButton
+            to={`/suppliers/${supplier._id}`}
+            icon="edit"
+            customClass="blue ml-1"
+          />
+          <FloatingButton
+            onClick={() => onDelete(supplier._id)}
+            icon="delete"
+            customClass="red ml-1"
+          />
+        </>
+      ),
     },
   ];
 

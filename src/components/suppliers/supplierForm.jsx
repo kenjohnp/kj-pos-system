@@ -7,6 +7,9 @@ import {
   setSupplierErrors,
   addSupplier,
   clearErrors,
+  getSupplier,
+  updateSupplier,
+  clearSelectedSupplier,
 } from "../../store/suppliers";
 import PageTitle from "../common/pageTitle";
 import { renderInput, renderButton } from "../common/renderForms";
@@ -14,7 +17,7 @@ import Loader from "../common/loader";
 
 const SupplierForm = ({ match }) => {
   const dispatch = useDispatch();
-  const { success, errors, loading } = useSelector(
+  const { success, errors, loading, selectedSupplier } = useSelector(
     (state) => state.entities.suppliers
   );
   const [redirectToSuppliers, setRedirectToSuppliers] = useState(false);
@@ -40,10 +43,19 @@ const SupplierForm = ({ match }) => {
   };
 
   useEffect(() => {
+    if (match.params.id !== "new")
+      dispatch(getSupplier({ _id: match.params.id }));
+
     return () => {
       dispatch(clearErrors());
+      dispatch(clearSelectedSupplier());
     };
   }, []);
+
+  useEffect(() => {
+    const supplier = { ...selectedSupplier };
+    setSupplier(supplier);
+  }, [selectedSupplier]);
 
   const handleChange = ({ currentTarget: input }) => {
     const newSupplier = { ...supplier };
@@ -60,6 +72,7 @@ const SupplierForm = ({ match }) => {
     if (formErrors) return;
 
     if (match.params.id === "new") dispatch(addSupplier(supplier));
+    else dispatch(updateSupplier({ _id: match.params.id, ...supplier }));
   };
   const cancel = () => {
     setRedirectToSuppliers(true);
