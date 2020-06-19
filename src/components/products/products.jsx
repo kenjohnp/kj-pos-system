@@ -59,8 +59,7 @@ const Products = () => {
 
   const handleConfirmDelete = () => {
     dispatch(removeProduct({ _id: selectedProduct }));
-    setSelectedProduct(null);
-    setIsModalOpen(false);
+    handleModalClose();
   };
 
   const handleModalClose = () => {

@@ -46,7 +46,7 @@ const slice = createSlice({
       suppliers.loading = false;
     },
     supplierRemoved: (suppliers, action) => {
-      suppliers.list = suppliers.filter(
+      suppliers.list = suppliers.list.filter(
         (supplier) => supplier._id !== action.payload._id
       );
       suppliers.loading = false;

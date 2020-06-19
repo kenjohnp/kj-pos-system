@@ -2,11 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import getPagedData from "../../utils/getPagedData";
-import { loadSuppliers, clearErrors, setSuccess } from "../../store/suppliers";
+import {
+  loadSuppliers,
+  clearErrors,
+  setSuccess,
+  removeSupplier,
+} from "../../store/suppliers";
 import PageTitle from "../common/pageTitle";
 import Pagination from "../common/pagination";
 import Loader from "../common/loader";
 import Search from "../common/search";
+import ConfirmModal from "../common/confirmModal";
 import SuppliersTable from "./suppliersTable";
 
 const Suppliers = () => {
@@ -23,6 +29,8 @@ const Suppliers = () => {
     pageSize: 7,
     currentPage: 1,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
 
   useEffect(() => {
     dispatch(loadSuppliers());
@@ -35,7 +43,21 @@ const Suppliers = () => {
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);
   };
-  const handleDelete = () => {};
+
+  const handleDelete = (id) => {
+    setIsModalOpen(true);
+    setSelectedSupplier(id);
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(removeSupplier({ _id: selectedSupplier }));
+    handleModalClose();
+  };
+
+  const handleModalClose = () => {
+    setSelectedSupplier(null);
+    setIsModalOpen(false);
+  };
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
@@ -62,6 +84,15 @@ const Suppliers = () => {
 
   return (
     <>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onRequestClose={handleModalClose}
+        onClose={handleModalClose}
+        onSubmit={handleConfirmDelete}
+        submitColor="red"
+        submitLabel="DELETE"
+        headerLabel="Confirm Delete"
+      />
       <PageTitle title="Suppliers" />
       {errors.apiError.message && (
         <div className="red white-text center statusBox">
