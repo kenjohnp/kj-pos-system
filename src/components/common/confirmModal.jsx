@@ -34,7 +34,7 @@ const ConfirmModal = ({
       style={customStyles}
     >
       <div className="modal-header green white-text">{headerLabel}</div>
-      <div className="modal-content">
+      <div className="modal-content confirm-modal-content">
         <button
           className={`waves-effect waves-light btn ${submitColor}`}
           onClick={onSubmit}

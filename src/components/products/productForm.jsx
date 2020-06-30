@@ -179,6 +179,7 @@ const ProductForm = ({ match }) => {
             placeHolder="Select Category..."
             onChange={(selectedItem) => handleChangeSelect(selectedItem)}
             error={errors.formErrors["category"]}
+            label="Category"
           />
           {renderButton("Submit", (e) => handleSubmit(e))}
           {renderButton(

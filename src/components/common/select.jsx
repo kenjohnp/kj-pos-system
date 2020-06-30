@@ -1,7 +1,7 @@
 import React from "react";
 import ReactSelect from "react-select";
 
-const Select = ({ options, value, placeHolder, onChange, error }) => {
+const Select = ({ options, value, placeHolder, onChange, error, label }) => {
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -45,7 +45,7 @@ const Select = ({ options, value, placeHolder, onChange, error }) => {
   return (
     <div className="row">
       <div className="col s12">
-        <label>Category</label>
+        <label>{label}</label>
         <ReactSelect
           options={options}
           isSearchable={true}

@@ -93,7 +93,7 @@ td {
   text-align: center;
 }
 
-.modal-content {
+.confirm-modal-content {
   display: flex;
   padding: 1rem;
   justify-content: center;

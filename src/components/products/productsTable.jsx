@@ -49,7 +49,7 @@ const ProductsTable = ({ products, sortColumn, onSort, onDelete }) => {
       data={products}
       sortColumn={sortColumn}
       onSort={onSort}
-    ></Table>
+    />
   );
 };
 
