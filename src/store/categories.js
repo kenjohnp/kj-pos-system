@@ -29,12 +29,12 @@ const slice = createSlice({
     categoryAdded: (categories, action) => {
       categories.list.push(action.payload);
       categories.success = true;
+      categories.loading = false;
     },
     categoryRemoved: (categories, action) => {
       categories.list = categories.list.filter(
         (category) => category._id !== action.payload._id
       );
-
       categories.loading = false;
     },
     categoryUpdated: (categories, action) => {
