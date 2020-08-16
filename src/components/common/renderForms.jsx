@@ -8,9 +8,10 @@ export const renderInput = ({
   error,
   placeholder,
   type,
+  disableRow = false,
   ...rest
 }) => (
-  <div className="row">
+  <div className={disableRow ? "" : "row"}>
     <Input
       label={label}
       placeholder={placeholder || ""}

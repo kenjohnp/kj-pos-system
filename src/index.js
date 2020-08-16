@@ -11,6 +11,7 @@ import "font-awesome/css/font-awesome.css";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import configureStore from "./store/configureStore";
+import "react-datepicker/dist/react-datepicker.css";
 
 const store = configureStore();
 

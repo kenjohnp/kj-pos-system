@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { loadStockEntries } from "../../store/stockEntries";
+import { loadStockEntries, setSuccess } from "../../store/stockEntries";
 import PageTitle from "../common/pageTitle";
 import Search from "../common/search";
-import { renderInput } from "../common/renderForms";
 import StockEntriesTable from "./stockEntriesTable";
 
 const StockEntries = () => {
@@ -20,6 +19,7 @@ const StockEntries = () => {
 
   useEffect(() => {
     dispatch(loadStockEntries());
+    dispatch(setSuccess(false));
   }, []);
 
   const handleChange = () => {};

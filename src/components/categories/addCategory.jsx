@@ -62,6 +62,7 @@ const AddCategory = () => {
             data: category["name"],
             error: errors.formErrors["name"],
             onChange: (e) => handleChange(e),
+            autoFocus: true,
           })}
           {renderButton("Submit", (e) => handleSubmit(e))}
           {renderButton("Cancel", cancel, "green lighten-5 black-text ml-1")}

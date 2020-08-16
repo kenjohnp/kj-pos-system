@@ -93,3 +93,5 @@ export const addStockEntry = (stockEntry) =>
     onSuccess: stockEntryAdded.type,
     onError: setApiError.type,
   });
+
+export const clearErrors = () => (dispatch) => dispatch(errorsCleared());

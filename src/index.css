@@ -25,6 +25,10 @@ code {
   padding: 0.3rem !important;
 }
 
+.m-0 {
+  margin: 0 !important;
+}
+
 .m-1 {
   margin: 1.5rem;
 }
@@ -98,4 +102,8 @@ td {
   padding: 1rem;
   justify-content: center;
   align-items: center;
+}
+
+.react-datepicker-wrapper {
+  display: block !important;
 }

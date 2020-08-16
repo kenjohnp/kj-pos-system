@@ -1,7 +1,16 @@
 import React from "react";
 import ReactSelect from "react-select";
 
-const Select = ({ options, value, placeHolder, onChange, error, label }) => {
+const Select = ({
+  options,
+  value,
+  placeHolder,
+  onChange,
+  error,
+  label,
+  customClass,
+  tableItem = false,
+}) => {
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -43,8 +52,8 @@ const Select = ({ options, value, placeHolder, onChange, error, label }) => {
   };
 
   return (
-    <div className="row">
-      <div className="col s12">
+    <div className={"row " + (tableItem && "m-0")}>
+      <div className={"col s12 " + (tableItem && "p-0")}>
         <label>{label}</label>
         <ReactSelect
           options={options}
