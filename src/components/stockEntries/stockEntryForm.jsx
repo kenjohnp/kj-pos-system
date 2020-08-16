@@ -47,9 +47,15 @@ const StockEntryForm = () => {
   }, []);
 
   const schema = {
-    supplier: Joi.string().required().label("Supplier"),
+    supplier: Joi.object({
+      _id: Joi.string().required().label("Supplier ID"),
+      name: Joi.string().required().label("Supplier Name"),
+    })
+      .required()
+      .label("Supplier"),
+
     refNo: Joi.string().required().label("Reference Number"),
-    remarks: Joi.string().label("Remarks"),
+    remarks: Joi.string().allow("").label("Remarks"),
     date: Joi.date().required().label("Date"),
     items: Joi.array()
       .items(
@@ -125,7 +131,10 @@ const StockEntryForm = () => {
     payloadItems.pop();
 
     const payload = {
-      supplier: stockEntry.supplier.value,
+      supplier: {
+        _id: stockEntry.supplier.value,
+        name: stockEntry.supplier.label,
+      },
       date: stockEntry.date.toDateString(),
       refNo: stockEntry.refNo,
       remarks: stockEntry.remarks,

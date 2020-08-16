@@ -15,7 +15,13 @@ const getPagedData = ({
       let result;
 
       for (let key of searchFields) {
-        result = d[key].toLowerCase().startsWith(searchQuery.toLowerCase());
+        const splitKey = key.split(".");
+
+        if (splitKey.length === 1) result = d[splitKey[0]];
+        else result = d[splitKey[0]][splitKey[1]];
+
+        result = result.toLowerCase().startsWith(searchQuery.toLowerCase());
+
         if (result) return result;
       }
     });

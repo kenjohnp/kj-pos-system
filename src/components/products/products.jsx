@@ -76,7 +76,7 @@ const Products = () => {
   const { totalCount, data } = getPagedData({
     data: products,
     searchQuery,
-    searchFields: ["description", "barcode"],
+    searchFields: ["description", "barcode", "category.name"],
     sortColumn,
     pagination,
   });

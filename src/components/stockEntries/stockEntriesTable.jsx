@@ -13,6 +13,14 @@ const StockEntriesTable = ({ stockEntries, sortColumn, onSort }) => {
       path: "supplier.name",
       label: "Supplier",
     },
+    {
+      path: "refNo",
+      label: "Reference Number",
+    },
+    {
+      path: "remarks",
+      label: "Remarks",
+    },
   ];
 
   return (
