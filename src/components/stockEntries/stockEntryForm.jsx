@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import DatePicker from "../common/datepicker";
-import Joi, { read } from "joi-browser";
+import Joi from "joi-browser";
 import _ from "lodash";
 import validate from "../../utils/validate";
 import { getCurrentUser } from "../../services/authService";
@@ -19,6 +19,7 @@ import {
   clearErrors,
   getStockEntry,
   clearSelectedStockEntry,
+  cancelStockEntry,
 } from "../../store/stockEntries";
 
 const StockEntryForm = ({ match }) => {
@@ -116,7 +117,6 @@ const StockEntryForm = ({ match }) => {
 
   const handleChangeItem = (path, index, value) => {
     const newStockEntry = { ...stockEntry };
-    console.log(path, index, value);
     newStockEntry.items[index][path] = value;
 
     setStockEntry(newStockEntry);
@@ -173,6 +173,15 @@ const StockEntryForm = ({ match }) => {
     if (formErrors) return;
 
     dispatch(addStockEntry(payload));
+    dispatch(loadProducts(false));
+  };
+
+  const cancelStockEntry = (e) => {
+    e.preventDefault();
+    console.log(e);
+
+    dispatch(cancelStockEntry(match.params.id));
+    // setRedirect(true);
   };
 
   const cancel = () => {
@@ -249,7 +258,11 @@ const StockEntryForm = ({ match }) => {
           {match.params.id === "new" &&
             renderButton("Submit", (e) => handleSubmit(e))}
           {match.params.id !== "new" &&
-            renderButton("Cancel Entry", cancel, "red white-text ml-1")}
+            renderButton(
+              "Cancel Entry",
+              (e) => cancelStockEntry(e),
+              "red white-text ml-1"
+            )}
           {renderButton(
             match.params.id === "new" ? "Cancel" : "Back",
             cancel,

@@ -60,6 +60,18 @@ const slice = createSlice({
       stockEntries.success = true;
       stockEntries.loading = false;
     },
+    stockEntryCancelled: (stockEntries, action) => {
+      const { _id } = action.payload;
+
+      const index = stockEntries.list.findIndex(
+        (stockEntry) => stockEntry._id === _id
+      );
+
+      if (index > -1) stockEntries.list[index].status = "Cancelled";
+
+      stockEntries.success = true;
+      stockEntries.loading = false;
+    },
     setStockEntryErrors: (stockEntries, action) => {
       stockEntries.errors.formErrors = action.payload.errors;
     },
@@ -97,6 +109,7 @@ export const {
   stockEntriesReceived,
   stockEntriesRequestFailed,
   stockEntryAdded,
+  stockEntryCancelled,
   setStockEntryErrors,
   errorsCleared,
   setApiError,
@@ -141,6 +154,15 @@ export const getStockEntry = (id) =>
     url: `${url}/${id}`,
     onStart: stockEntriesRequested.type,
     onSuccess: stockEntryReceived.type,
+    onError: setApiError.type,
+  });
+
+export const cancelStockEntry = (id) =>
+  apiCallBegan({
+    url: `${url}/${id}`,
+    method: "put",
+    onStart: stockEntriesRequested.type,
+    onSuccess: stockEntryCancelled.type,
     onError: setApiError.type,
   });
 

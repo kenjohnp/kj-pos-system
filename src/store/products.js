@@ -109,11 +109,14 @@ export default slice.reducer;
 //ACTION CREATORS
 const url = "/products";
 
-export const loadProducts = () => (dispatch, getState) => {
+export const loadProducts = (caching = true) => (dispatch, getState) => {
   const { lastFetch } = getState().entities.products;
 
-  // const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
-  // if (diffInMinutes < 10) return;
+  console.log(caching);
+
+  const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
+
+  if (diffInMinutes < 10 && caching === true) return;
 
   return dispatch(
     apiCallBegan({
