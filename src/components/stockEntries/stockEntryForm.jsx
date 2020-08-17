@@ -248,6 +248,8 @@ const StockEntryForm = ({ match }) => {
           />
           {match.params.id === "new" &&
             renderButton("Submit", (e) => handleSubmit(e))}
+          {match.params.id !== "new" &&
+            renderButton("Cancel Entry", cancel, "red white-text ml-1")}
           {renderButton(
             match.params.id === "new" ? "Cancel" : "Back",
             cancel,

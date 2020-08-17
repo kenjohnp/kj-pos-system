@@ -24,7 +24,7 @@ const StockEntriesTable = ({ stockEntries, sortColumn, onSort }) => {
     },
     {
       key: "options",
-      label: "View/Cancel",
+      label: "View",
       content: (stockEntry) => (
         <>
           <FloatingButton
@@ -32,7 +32,6 @@ const StockEntriesTable = ({ stockEntries, sortColumn, onSort }) => {
             icon="visibility"
             customClass="green ml-1"
           />
-          <FloatingButton icon="cancel" customClass="red ml-1" />
         </>
       ),
     },
