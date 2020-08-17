@@ -173,15 +173,14 @@ const StockEntryForm = ({ match }) => {
     if (formErrors) return;
 
     dispatch(addStockEntry(payload));
-    dispatch(loadProducts(false));
+    setRedirect(true);
   };
 
-  const cancelStockEntry = (e) => {
+  const handleClickCancel = (e) => {
     e.preventDefault();
-    console.log(e);
 
     dispatch(cancelStockEntry(match.params.id));
-    // setRedirect(true);
+    setRedirect(true);
   };
 
   const cancel = () => {
@@ -260,7 +259,7 @@ const StockEntryForm = ({ match }) => {
           {match.params.id !== "new" &&
             renderButton(
               "Cancel Entry",
-              (e) => cancelStockEntry(e),
+              (e) => handleClickCancel(e),
               "red white-text ml-1"
             )}
           {renderButton(

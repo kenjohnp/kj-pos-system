@@ -23,6 +23,10 @@ const StockEntriesTable = ({ stockEntries, sortColumn, onSort }) => {
       label: "Remarks",
     },
     {
+      path: "status",
+      label: "Status",
+    },
+    {
       key: "options",
       label: "View",
       content: (stockEntry) => (

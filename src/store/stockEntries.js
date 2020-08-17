@@ -57,7 +57,6 @@ const slice = createSlice({
     },
     stockEntryAdded: (stockEntries, action) => {
       stockEntries.list.push(action.payload);
-      stockEntries.success = true;
       stockEntries.loading = false;
     },
     stockEntryCancelled: (stockEntries, action) => {
@@ -69,7 +68,6 @@ const slice = createSlice({
 
       if (index > -1) stockEntries.list[index].status = "Cancelled";
 
-      stockEntries.success = true;
       stockEntries.loading = false;
     },
     setStockEntryErrors: (stockEntries, action) => {
