@@ -5,7 +5,7 @@ import Input from "../common/input";
 import Select from "../common/select";
 import FloatingButton from "../common/floatingButton";
 
-const StockItems = ({ items, onChange, onDelete }) => {
+const StockItems = ({ items, onChange, onDelete, readOnly }) => {
   const { list: products } = useSelector((state) => state.entities.products);
 
   const [productsOptions, setProductsOptions] = useState([]);
@@ -53,6 +53,7 @@ const StockItems = ({ items, onChange, onDelete }) => {
             filterSelected();
           }}
           value={item.item}
+          isDisabled={readOnly}
         />
       ),
     },
@@ -69,13 +70,15 @@ const StockItems = ({ items, onChange, onDelete }) => {
           min={0}
           style={{ textAlign: "right" }}
           onChange={(e) => onChange("qty", item.index, e.currentTarget.value)}
+          readOnly={readOnly}
         />
       ),
     },
     {
       key: "delete",
       content: (item) =>
-        item.item !== "" && (
+        item.item !== "" &&
+        !readOnly && (
           <FloatingButton
             icon="delete"
             customClass="red ml-1"

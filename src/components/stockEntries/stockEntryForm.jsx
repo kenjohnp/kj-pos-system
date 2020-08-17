@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import DatePicker from "../common/datepicker";
-import Joi from "joi-browser";
+import Joi, { read } from "joi-browser";
+import _ from "lodash";
 import validate from "../../utils/validate";
 import { getCurrentUser } from "../../services/authService";
 import { loadSuppliers } from "../../store/suppliers";
@@ -16,12 +17,15 @@ import {
   setStockEntryErrors,
   addStockEntry,
   clearErrors,
+  getStockEntry,
+  clearSelectedStockEntry,
 } from "../../store/stockEntries";
 
-const StockEntryForm = () => {
+const StockEntryForm = ({ match }) => {
   const dispatch = useDispatch();
   const { list: suppliers } = useSelector((state) => state.entities.suppliers);
-  const { success, errors, loading } = useSelector(
+
+  const { success, errors, loading, selectedStockEntry } = useSelector(
     (state) => state.entities.stockEntries
   );
 
@@ -36,15 +40,34 @@ const StockEntryForm = () => {
     items: [{ index: 0, item: "", qty: 1 }],
   });
   const [redirect, setRedirect] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
 
   useEffect(() => {
     dispatch(loadSuppliers());
     dispatch(loadProducts());
 
+    if (match.params.id !== "new") {
+      dispatch(getStockEntry(match.params.id));
+      setReadOnly(true);
+    }
+
     return () => {
       dispatch(clearErrors());
+      dispatch(clearSelectedStockEntry());
     };
   }, []);
+
+  useEffect(() => {
+    mapSelectedToState();
+  }, [selectedStockEntry]);
+
+  const mapSelectedToState = () => {
+    if (!_.isEmpty(selectedStockEntry) && match.params.id !== "new") {
+      const newStockEntry = { ...selectedStockEntry };
+      newStockEntry.date = new Date(selectedStockEntry.date);
+      setStockEntry(newStockEntry);
+    }
+  };
 
   const schema = {
     supplier: Joi.object({
@@ -93,7 +116,9 @@ const StockEntryForm = () => {
 
   const handleChangeItem = (path, index, value) => {
     const newStockEntry = { ...stockEntry };
+    console.log(path, index, value);
     newStockEntry.items[index][path] = value;
+
     setStockEntry(newStockEntry);
 
     if (stockEntry.items[stockEntry.items.length - 1].item !== "")
@@ -182,12 +207,14 @@ const StockEntryForm = () => {
             value={stockEntry.supplier}
             onChange={handleChangeSupplier}
             error={errors.formErrors["supplier"]}
+            isDisabled={readOnly}
           />
 
           <DatePicker
             selected={stockEntry.date}
             onChange={handleChangeDate}
             error={errors.formErrors["date"]}
+            readOnly={readOnly}
           />
           {renderInput({
             name: "remarks",
@@ -197,6 +224,7 @@ const StockEntryForm = () => {
             disableRow: true,
             onChange: handleChangeText,
             error: errors.formErrors["remarks"],
+            readOnly,
           })}
           {renderInput({
             name: "refNo",
@@ -206,6 +234,7 @@ const StockEntryForm = () => {
             disableRow: true,
             onChange: handleChangeText,
             error: errors.formErrors["refNo"],
+            readOnly,
           })}
           <h6>Items</h6>
           {errors.formErrors["items"] && (
@@ -215,9 +244,15 @@ const StockEntryForm = () => {
             items={stockEntry.items}
             onChange={handleChangeItem}
             onDelete={handleDelete}
+            readOnly={readOnly}
           />
-          {renderButton("Submit", (e) => handleSubmit(e))}
-          {renderButton("Cancel", cancel, "green lighten-5 black-text ml-1")}
+          {match.params.id === "new" &&
+            renderButton("Submit", (e) => handleSubmit(e))}
+          {renderButton(
+            match.params.id === "new" ? "Cancel" : "Back",
+            cancel,
+            "green lighten-5 black-text ml-1"
+          )}
         </form>
       </div>
     </>

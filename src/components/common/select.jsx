@@ -8,8 +8,8 @@ const Select = ({
   onChange,
   error,
   label,
-  customClass,
   tableItem = false,
+  ...rest
 }) => {
   const customStyles = {
     control: (provided, state) => ({
@@ -62,6 +62,7 @@ const Select = ({
           placeholder={placeHolder}
           value={value}
           onChange={onChange}
+          {...rest}
         />
         {error && <div className="red-text">{error}</div>}
       </div>

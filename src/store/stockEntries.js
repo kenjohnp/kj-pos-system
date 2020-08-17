@@ -6,6 +6,7 @@ const slice = createSlice({
   name: "stockEntries",
   initialState: {
     list: [],
+    selectedStockEntry: {},
     loading: false,
     lastFetch: null,
     errors: {
@@ -17,6 +18,33 @@ const slice = createSlice({
   reducers: {
     stockEntriesRequested: (stockEntries, action) => {
       stockEntries.loading = true;
+    },
+    stockEntryReceived: (stockEntries, action) => {
+      const { supplier, refNo, remarks, date, items } = action.payload;
+
+      let newItems = [];
+      for (let i = 0; i < items.length; i++)
+        newItems.push({
+          index: i,
+          item: {
+            label: items[i].description,
+            value: items[i].productId,
+          },
+          qty: items[i].qty,
+        });
+
+      stockEntries.selectedStockEntry = {
+        supplier: {
+          value: supplier._id,
+          label: supplier.name,
+        },
+        refNo,
+        remarks,
+        date,
+        items: newItems,
+      };
+
+      stockEntries.loading = false;
     },
     stockEntriesReceived: (stockEntries, action) => {
       stockEntries.list = action.payload;
@@ -41,6 +69,18 @@ const slice = createSlice({
         apiError: {},
       };
     },
+    selectedStockEntryCleared: (stockEntries, action) => {
+      stockEntries.selectedStockEntry = {
+        supplier: {
+          label: "",
+          value: "",
+        },
+        refNo: "",
+        remarks: "",
+        date: new Date().toDateString(),
+        items: [{ index: 0, item: "", qty: 1 }],
+      };
+    },
     setApiError: (stockEntries, action) => {
       stockEntries.errors.apiError = action.payload.errors;
       stockEntries.loading = false;
@@ -53,6 +93,7 @@ const slice = createSlice({
 
 export const {
   stockEntriesRequested,
+  stockEntryReceived,
   stockEntriesReceived,
   stockEntriesRequestFailed,
   stockEntryAdded,
@@ -60,6 +101,7 @@ export const {
   errorsCleared,
   setApiError,
   setSuccess,
+  selectedStockEntryCleared,
 } = slice.actions;
 
 export default slice.reducer;
@@ -94,4 +136,14 @@ export const addStockEntry = (stockEntry) =>
     onError: setApiError.type,
   });
 
+export const getStockEntry = (id) =>
+  apiCallBegan({
+    url: `${url}/${id}`,
+    onStart: stockEntriesRequested.type,
+    onSuccess: stockEntryReceived.type,
+    onError: setApiError.type,
+  });
+
 export const clearErrors = () => (dispatch) => dispatch(errorsCleared());
+export const clearSelectedStockEntry = () => (dispatch) =>
+  dispatch(selectedStockEntryCleared());

@@ -1,6 +1,7 @@
 import React from "react";
 import Table from "../common/table";
 import moment from "moment";
+import FloatingButton from "../common/floatingButton";
 
 const StockEntriesTable = ({ stockEntries, sortColumn, onSort }) => {
   const columns = [
@@ -20,6 +21,20 @@ const StockEntriesTable = ({ stockEntries, sortColumn, onSort }) => {
     {
       path: "remarks",
       label: "Remarks",
+    },
+    {
+      key: "options",
+      label: "View/Cancel",
+      content: (stockEntry) => (
+        <>
+          <FloatingButton
+            to={`/stockentries/${stockEntry._id}`}
+            icon="visibility"
+            customClass="green ml-1"
+          />
+          <FloatingButton icon="cancel" customClass="red ml-1" />
+        </>
+      ),
     },
   ];
 
