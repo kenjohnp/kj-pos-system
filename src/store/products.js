@@ -112,8 +112,8 @@ const url = "/products";
 export const loadProducts = () => (dispatch, getState) => {
   const { lastFetch } = getState().entities.products;
 
-  const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
-  if (diffInMinutes < 10) return;
+  // const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
+  // if (diffInMinutes < 10) return;
 
   return dispatch(
     apiCallBegan({
