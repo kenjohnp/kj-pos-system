@@ -10,30 +10,28 @@ const StockItems = ({ items, onChange, onDelete, readOnly }) => {
 
   const [productsOptions, setProductsOptions] = useState([]);
 
-  const initialOptions = products.map((p) => ({
-    label: p.description,
-    value: p._id,
-  }));
+  const initialOptions = () => {
+    return products.map((p) => ({
+      label: p.description,
+      value: p._id,
+    }));
+  };
 
   useEffect(() => {
-    setProductsOptions(initialOptions);
+    setProductsOptions(initialOptions());
   }, [products]);
 
   const filterSelected = () => {
-    let selectedItems = [];
+    const selectedItems = [];
+
     for (let i = 0; i < items.length; i++) selectedItems.push(items[i].item);
 
-    const newProductOptions = productsOptions.filter(
-      (i) => !selectedItems.includes(i)
+    const newProductOptions = initialOptions().filter(
+      (i) => !selectedItems.find((s) => s.value === i.value)
     );
 
-    setProductsOptions(newProductOptions);
-  };
+    console.log(selectedItems);
 
-  const returnItemOption = (selectedItem) => {
-    const newProductOptions = [...productsOptions];
-    newProductOptions.push(selectedItem);
-    newProductOptions.sort((a, b) => (a.label > b.label ? 1 : -1));
     setProductsOptions(newProductOptions);
   };
 
@@ -49,6 +47,7 @@ const StockItems = ({ items, onChange, onDelete, readOnly }) => {
           placeHolder="Select item"
           tableItem
           onChange={(selectedItem) => {
+            const currentItem = item.item;
             onChange("item", item.index, selectedItem);
             filterSelected();
           }}
@@ -84,7 +83,7 @@ const StockItems = ({ items, onChange, onDelete, readOnly }) => {
             customClass="red ml-1"
             onClick={() => {
               onDelete(item.index);
-              returnItemOption(item.item);
+              filterSelected();
             }}
           />
         ),

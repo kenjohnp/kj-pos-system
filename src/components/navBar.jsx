@@ -24,6 +24,9 @@ const NavBar = () => {
               {auth.getCurrentUser().isAdmin && (
                 <Fragment>
                   <li>
+                    <NavLink to="/transaction">Transaction</NavLink>
+                  </li>
+                  <li>
                     <NavLink to="/users">Users</NavLink>
                   </li>
                   <li>

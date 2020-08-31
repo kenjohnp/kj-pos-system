@@ -1,5 +1,7 @@
 import React from "react";
 import ReactSelect from "react-select";
+import ConditionalWrapper from "../common/conditionalWrapper";
+import { renderButton } from "../common/renderForms";
 
 const Select = ({
   options,
@@ -8,7 +10,10 @@ const Select = ({
   onChange,
   error,
   label,
+  name,
   tableItem = false,
+  wrappedInRow = true,
+  isDisabled = false,
   ...rest
 }) => {
   const customStyles = {
@@ -38,6 +43,16 @@ const Select = ({
       },
     }),
 
+    menuList: (provided, state) => ({
+      ...provided,
+      position: "absolute",
+      backgroundColor: "white",
+      zIndex: "999",
+      borderLeft: "5px solid green",
+      borderRight: "1px solid #ccc",
+      width: "100%",
+    }),
+
     valueContainer: (provided, state) => ({
       ...provided,
       height: "40px",
@@ -52,21 +67,26 @@ const Select = ({
   };
 
   return (
-    <div className={"row " + (tableItem && "m-0")}>
-      <div className={"col s12 " + (tableItem && "p-0")}>
-        <label>{label}</label>
-        <ReactSelect
-          options={options}
-          isSearchable={true}
-          styles={customStyles}
-          placeholder={placeHolder}
-          value={value}
-          onChange={onChange}
-          {...rest}
-        />
-        {error && <div className="red-text">{error}</div>}
-      </div>
-    </div>
+    <ConditionalWrapper
+      condition={wrappedInRow}
+      wrapper={(children) => (
+        <div className={"row " + (tableItem && "m-0")}>
+          <div className={"col s12 " + (tableItem && "p-0")}>{children}</div>
+        </div>
+      )}
+    >
+      <label>{label}</label>
+      <ReactSelect
+        options={options}
+        isSearchable={true}
+        styles={customStyles}
+        placeholder={placeHolder}
+        value={value}
+        onChange={onChange}
+        {...rest}
+      />
+      {error && <div className="red-text">{error}</div>}
+    </ConditionalWrapper>
   );
 };
 

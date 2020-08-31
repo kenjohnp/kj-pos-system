@@ -20,7 +20,7 @@ const slice = createSlice({
       stockEntries.loading = true;
     },
     stockEntryReceived: (stockEntries, action) => {
-      const { supplier, refNo, remarks, date, items } = action.payload;
+      const { supplier, refNo, remarks, date, items, status } = action.payload;
 
       let newItems = [];
       for (let i = 0; i < items.length; i++)
@@ -42,6 +42,7 @@ const slice = createSlice({
         remarks,
         date,
         items: newItems,
+        status,
       };
 
       stockEntries.loading = false;

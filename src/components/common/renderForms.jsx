@@ -30,6 +30,22 @@ export const renderButton = (label, onClick, customClass) => (
   </button>
 );
 
+export const renderIconButton = (
+  label,
+  onClick,
+  icon,
+  size = "large",
+  customClass
+) => (
+  <a
+    className={`waves-effect waves-light btn-${size} ${customClass}`}
+    style={{ marginRight: "5px" }}
+    onClick={onClick}
+  >
+    <i className="material-icons left">{icon}</i>
+    {label}
+  </a>
+);
 export const renderRadioButton = (name, label, checked, onChange) => (
   <p>
     <label>
