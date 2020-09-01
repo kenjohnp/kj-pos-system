@@ -10,7 +10,8 @@ import Select from "../common/select";
 import TransactionItems from "./transactionItems";
 import { loadProducts } from "../../store/products";
 import { transactionErrorsSet, clearErrors } from "../../store/transactions";
-import M from "materialize-css";
+import Summary from "./summary";
+import Payment from "./payment";
 
 const Transaction = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,12 @@ const Transaction = () => {
     no: "202040294452",
     date: new Date().toDateString(),
     items: [],
+    cashReceived: 0,
+    amountSummary: {
+      vat: { label: "VAT", value: 0 },
+      subTotal: { label: "Sub-Total", value: 0 },
+      total: { label: "Total Sales", value: 0 },
+    },
   });
 
   const [barcode, setBarcode] = useState("");
@@ -43,6 +50,10 @@ const Transaction = () => {
     dispatch(loadProducts());
     return () => dispatch(clearErrors());
   }, []);
+
+  useEffect(() => {
+    computeSummary();
+  }, [transaction]);
 
   const handleChangeBarcode = (e) => {
     setBarcode(e.currentTarget.value);
@@ -120,7 +131,6 @@ const Transaction = () => {
   const handleAddProduct = () => {
     addToItems(selectedProduct.value);
     setSelectedProduct({});
-    computeTotalAmount();
   };
 
   const handleChangeItem = (path, index, value) => {
@@ -128,25 +138,34 @@ const Transaction = () => {
     newTransaction.items[index][path] = value;
 
     setTransaction(newTransaction);
-    computeTotalAmount();
   };
 
-  const computeTotalAmount = () => {
-    const totalAmount = transaction.items.reduce(
-      (a, b) => a + b.qty * (b.price - b.discount),
-      0
-    );
+  const getTotalAmount = () =>
+    transaction.items.reduce((a, b) => a + b.qty * (b.price - b.discount), 0);
 
-    const newAmountSummary = { ...amountSummary };
-    newAmountSummary.total.value = totalAmount;
-    newAmountSummary.vat.value = totalAmount * 0.12;
-    newAmountSummary.subTotal.value =
-      newAmountSummary.total.value - newAmountSummary.vat.value;
+  const computeSummary = () => {
+    const totalAmount = getTotalAmount();
 
-    setAmountSummary(newAmountSummary);
+    const newTransaction = { ...transaction };
+
+    const { total, vat, subTotal } = newTransaction.amountSummary;
+
+    total.value = totalAmount;
+    vat.value = totalAmount * 0.12;
+    subTotal.value = total.value - vat.value;
+
+    setAmountSummary(newTransaction);
   };
 
   const handleSave = () => {};
+
+  const handleChangeCashReceived = (value) => {
+    const newTransaction = { ...transaction };
+    newTransaction.cashReceived = value;
+    setTransaction(newTransaction);
+  };
+
+  const totalAmount = getTotalAmount();
 
   return (
     <>
@@ -216,56 +235,15 @@ const Transaction = () => {
         </div>
         <div className="row">
           <div className="col s4">
-            <table>
-              <tbody>
-                <tr>
-                  <td>
-                    <b>Payments Received (Cash)</b>
-                  </td>
-                  <td>
-                    <input style={{ textAlign: "right" }}></input>
-                  </td>
-                </tr>
-                <tr
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: "1.5rem",
-                    color: "green",
-                  }}
-                >
-                  <td>Change</td>
-                  <td>0</td>
-                </tr>
-              </tbody>
-            </table>
+            <Payment
+              received={transaction.cashReceived}
+              totalAmount={totalAmount}
+              onChange={handleChangeCashReceived}
+            />
           </div>
           <div className="col s4"></div>
           <div className="col s4">
-            <table>
-              <tbody>
-                {Object.entries(amountSummary).map((i) => (
-                  <tr
-                    key={i[1].label}
-                    style={
-                      i[0] === "total"
-                        ? {
-                            fontWeight: "bold",
-                            fontSize: "1.5rem",
-                            color: "green",
-                          }
-                        : {}
-                    }
-                  >
-                    <td>
-                      <b>{i[1].label}</b>
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      {"PHP " + i[1].value.toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Summary data={transaction.amountSummary} />
           </div>
         </div>
         {renderIconButton("New", handleSave, "add", "large", "blue")}
