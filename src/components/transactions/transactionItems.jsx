@@ -2,8 +2,9 @@ import React from "react";
 import Table from "../common/table";
 import Input from "../common/input";
 import FloatingButton from "../common/floatingButton";
+import CurrencyInput from "react-currency-input-field";
 
-const TransactionItems = ({ items, onChange }) => {
+const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
   const columns = [
     {
       label: "Barcode",
@@ -25,22 +26,34 @@ const TransactionItems = ({ items, onChange }) => {
       path: "qty",
       style: { textAlign: "right" },
       width: "10%",
-      content: (item) =>
-        renderInput("qty", item, {
-          readOnly: false,
-          onChange,
-        }),
+      content: (item) => (
+        <Input
+          name="qty"
+          value={item.qty}
+          type="number"
+          customClass="m-0"
+          min={1}
+          style={{ textAlign: "right" }}
+          onChange={(e) => onChange(item.index, e.currentTarget.value)}
+          onKeyPress={(e) => preventNegative(e)}
+        />
+      ),
     },
     {
       label: "Discount",
       path: "discount",
       style: { textAlign: "right" },
       width: "10%",
-      content: (item) =>
-        renderInput("discount", item, {
-          readOnly: false,
-          onChange,
-        }),
+      content: (item) => (
+        <CurrencyInput
+          name="discount"
+          placeholder="0.00"
+          prefix=""
+          value={item.discount}
+          onChange={(value, name) => onChangeDiscount(value, name, item.index)}
+          style={{ textAlign: "right" }}
+        />
+      ),
     },
     {
       label: "Total Amount",
@@ -49,7 +62,8 @@ const TransactionItems = ({ items, onChange }) => {
       width: "15%",
       content: (item) =>
         renderInput("totalAmount", {
-          totalAmount: item.qty * (item.price - item.discount),
+          totalAmount: item.qty * (item.price - (item.discount || 0)),
+          index: item.index,
         }),
     },
     {
@@ -58,26 +72,33 @@ const TransactionItems = ({ items, onChange }) => {
         <FloatingButton
           icon="delete"
           customClass="red ml-1"
-          onClick={() => {}}
+          onClick={() => onDelete(item.index)}
         />
       ),
     },
   ];
 
-  const renderInput = (path, item, options = {}) => (
-    <Input
+  const renderInput = (path, item) => (
+    <CurrencyInput
       name={path + item.index}
-      value={item[path]}
-      type="number"
-      customClass="m-0"
-      min={0}
+      value={item[path] || "0.00"}
+      customclass="m-0"
       style={{ textAlign: "right" }}
-      onChange={(e) =>
-        options.onChange(path, item.index, e.currentTarget.value)
-      }
-      readOnly={options.readOnly === false ? false : true}
+      readOnly
     />
   );
+
+  const preventNegative = (e) => {
+    if (
+      !(
+        (e.keyCode > 95 && e.keyCode < 106) ||
+        (e.keyCode > 47 && e.keyCode < 58) ||
+        e.keyCode == 8
+      )
+    ) {
+      return false;
+    }
+  };
 
   return <Table data={items} columns={columns} />;
 };

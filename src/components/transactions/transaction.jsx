@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Joi from "joi-browser";
+import validate from "../../utils/validate";
 import PageTitle from "../common/pageTitle";
 import {
   renderInput,
@@ -9,7 +11,11 @@ import {
 import Select from "../common/select";
 import TransactionItems from "./transactionItems";
 import { loadProducts } from "../../store/products";
-import { transactionErrorsSet, clearErrors } from "../../store/transactions";
+import {
+  transactionErrorsSet,
+  clearErrors,
+  generateTransactionId,
+} from "../../store/transactions";
 import Summary from "./summary";
 import Payment from "./payment";
 
@@ -17,7 +23,9 @@ const Transaction = () => {
   const dispatch = useDispatch();
 
   const { list: products } = useSelector((state) => state.entities.products);
-  const { errors } = useSelector((state) => state.entities.transactions);
+  const { currentNo, errors } = useSelector(
+    (state) => state.entities.transactions
+  );
 
   const productsOptions = products.map((p) => ({
     label: p.description,
@@ -25,22 +33,15 @@ const Transaction = () => {
   }));
 
   const [transaction, setTransaction] = useState({
-    no: "202040294452",
     date: new Date().toDateString(),
     items: [],
     cashReceived: 0,
-    amountSummary: {
-      vat: { label: "VAT", value: 0 },
-      subTotal: { label: "Sub-Total", value: 0 },
-      total: { label: "Total Sales", value: 0 },
-    },
   });
 
   const [barcode, setBarcode] = useState("");
-
   const [selectedProduct, setSelectedProduct] = useState({});
-
   const [amountSummary, setAmountSummary] = useState({
+    discount: { label: "Total Discount", value: 0 },
     vat: { label: "VAT", value: 0 },
     subTotal: { label: "Sub-Total", value: 0 },
     total: { label: "Total Sales", value: 0 },
@@ -48,12 +49,29 @@ const Transaction = () => {
 
   useEffect(() => {
     dispatch(loadProducts());
+    dispatch(generateTransactionId());
     return () => dispatch(clearErrors());
   }, []);
 
   useEffect(() => {
     computeSummary();
   }, [transaction]);
+
+  const schema = {
+    date: Joi.date().required().label("Date"),
+    items: Joi.array()
+      .items(
+        Joi.object({
+          barcode: Joi.string().allow("").label("Barcode"),
+          itemName: Joi.string().required().label("Item Name"),
+          price: Joi.number().min(1).required().label("Price"),
+          qty: Joi.number().min(1).required().label("Qty"),
+          discount: Joi.number().min(0).required().label("Discount"),
+        })
+      )
+      .min(1)
+      .label("Items"),
+  };
 
   const handleChangeBarcode = (e) => {
     setBarcode(e.currentTarget.value);
@@ -85,6 +103,15 @@ const Transaction = () => {
   const getExistingProduct = (barcode) => {
     return transaction.items.find((i) => i.barcode === barcode);
   };
+
+  const getTotalAmount = () =>
+    transaction.items.reduce(
+      (a, b) => a + (b.qty || 0) * (b.price - (parseFloat(b.discount) || 0)),
+      0
+    );
+
+  const getTotalDiscount = () =>
+    transaction.items.reduce((a, b) => a + (parseFloat(b.discount) || 0), 0);
 
   const addProduct = (barcode, product) => {
     const { description, price } = product;
@@ -133,31 +160,44 @@ const Transaction = () => {
     setSelectedProduct({});
   };
 
-  const handleChangeItem = (path, index, value) => {
+  const handleChangeQty = (index, value) => {
     const newTransaction = { ...transaction };
-    newTransaction.items[index][path] = value;
+
+    if (value < 0) return;
+    newTransaction.items[index].qty = value;
 
     setTransaction(newTransaction);
   };
 
-  const getTotalAmount = () =>
-    transaction.items.reduce((a, b) => a + b.qty * (b.price - b.discount), 0);
+  const handleChangeDiscount = (value, name, index) => {
+    const newTransaction = { ...transaction };
+    newTransaction.items[index][name] = value;
+    setTransaction(newTransaction);
+  };
+
+  const handleRemoveItem = (index) => {
+    const newTransaction = { ...transaction };
+    newTransaction.items.splice(index, 1);
+
+    setTransaction(newTransaction);
+    resetIndex();
+  };
 
   const computeSummary = () => {
     const totalAmount = getTotalAmount();
+    const totalDiscount = getTotalDiscount();
 
-    const newTransaction = { ...transaction };
+    const newAmountSummary = { ...amountSummary };
 
-    const { total, vat, subTotal } = newTransaction.amountSummary;
+    const { total, vat, subTotal, discount } = newAmountSummary;
 
+    discount.value = totalDiscount;
     total.value = totalAmount;
     vat.value = totalAmount * 0.12;
     subTotal.value = total.value - vat.value;
 
-    setAmountSummary(newTransaction);
+    setAmountSummary(newAmountSummary);
   };
-
-  const handleSave = () => {};
 
   const handleChangeCashReceived = (value) => {
     const newTransaction = { ...transaction };
@@ -166,6 +206,32 @@ const Transaction = () => {
   };
 
   const totalAmount = getTotalAmount();
+
+  const resetIndex = () => {
+    const newTransaction = { ...transaction };
+
+    for (let i = 0; i < newTransaction.items.length; i++)
+      newTransaction.items[i].index = i;
+
+    setTransaction(newTransaction);
+  };
+
+  const handleSubmit = () => {
+    const payload = {
+      date: transaction.date,
+      cashReceived: transaction.cashReceived,
+      items: transaction.items,
+    };
+
+    let formErrors = validate(payload, schema) || {};
+
+    if (transaction.cashReceived < totalAmount)
+      formErrors.cashReceived = "Enter the right amount";
+
+    if (formErrors) console.log(formErrors);
+
+    dispatch(transactionErrorsSet({ errors: formErrors || {} }));
+  };
 
   return (
     <>
@@ -177,7 +243,7 @@ const Transaction = () => {
             label: "Transaction No.",
             customClass: "col s4",
             disableRow: true,
-            defaultValue: transaction.no,
+            value: currentNo || "",
             readOnly: true,
           })}
           <div className="col s6"></div>
@@ -228,7 +294,9 @@ const Transaction = () => {
             <div className="col s12" style={{ minHeight: "300px" }}>
               <TransactionItems
                 items={transaction.items}
-                onChange={handleChangeItem}
+                onChange={handleChangeQty}
+                onDelete={handleRemoveItem}
+                onChangeDiscount={handleChangeDiscount}
               />
             </div>
           </div>
@@ -239,24 +307,25 @@ const Transaction = () => {
               received={transaction.cashReceived}
               totalAmount={totalAmount}
               onChange={handleChangeCashReceived}
+              error={errors.formErrors["cashReceived"]}
             />
           </div>
           <div className="col s4"></div>
           <div className="col s4">
-            <Summary data={transaction.amountSummary} />
+            <Summary data={amountSummary} />
           </div>
         </div>
-        {renderIconButton("New", handleSave, "add", "large", "blue")}
-        {renderIconButton("Cancel", handleSave, "cancel", "large", "red")}
+        {renderIconButton("New", handleSubmit, "add", "large", "blue")}
+        {renderIconButton("Cancel", handleSubmit, "cancel", "large", "red")}
         {renderIconButton(
           "Print Receipt",
-          handleSave,
+          handleSubmit,
           "print",
           "large",
           "teal"
         )}
-        {renderIconButton("History", handleSave, "save", "large", "grey")}
-        {renderIconButton("Finish", handleSave, "save", "large", "green")}
+        {renderIconButton("History", handleSubmit, "save", "large", "grey")}
+        {renderIconButton("Finish", handleSubmit, "save", "large", "green")}
       </div>
     </>
   );

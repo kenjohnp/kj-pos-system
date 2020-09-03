@@ -21,7 +21,11 @@ const Summary = ({ data }) => {
               <b>{i[1].label}</b>
             </td>
             <td style={{ textAlign: "right" }}>
-              {"PHP " + i[1].value.toLocaleString()}
+              {"PHP " +
+                i[1].value.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
             </td>
           </tr>
         ))}

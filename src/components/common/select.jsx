@@ -1,7 +1,6 @@
 import React from "react";
 import ReactSelect from "react-select";
 import ConditionalWrapper from "../common/conditionalWrapper";
-import { renderButton } from "../common/renderForms";
 
 const Select = ({
   options,
@@ -32,17 +31,15 @@ const Select = ({
         boxShadow: "0 1px 0 0 #26a69a",
       },
     }),
-
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected && "white",
-      color: state.isSelected && "black",
+      backgroundColor: state.isFocused && "#4CAF50",
+      color: state.isFocused && "white",
       "&:hover": {
         backgroundColor: "#4CAF50",
         color: "white",
       },
     }),
-
     menuList: (provided, state) => ({
       ...provided,
       position: "absolute",

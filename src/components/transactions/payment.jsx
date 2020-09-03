@@ -2,7 +2,7 @@ import React from "react";
 import { renderInput } from "../common/renderForms";
 import CurrencyInput from "react-currency-input-field";
 
-const Payment = ({ received, onChange, totalAmount }) => {
+const Payment = ({ received, onChange, totalAmount, error }) => {
   return (
     <table>
       <tbody>
@@ -11,21 +11,14 @@ const Payment = ({ received, onChange, totalAmount }) => {
             <b>Payments Received (Cash)</b>
           </td>
           <td>
-            {/* {renderInput({
-              name: "paymentReceived",
-              disableRow: true,
-              value: received,
-              onChange,
-              style: { textAlign: "right" },
-            })} */}
             <CurrencyInput
               name="cashReceived"
               placeholder="PHP 0.00"
-              fixedDecimalLength={2}
               prefix="PHP "
-              defaultValue={received}
+              value={received}
               onChange={onChange}
             />
+            {error && <span className="red-text">{error}</span>}
           </td>
         </tr>
         <tr
@@ -38,7 +31,9 @@ const Payment = ({ received, onChange, totalAmount }) => {
           <td>Change</td>
           <td>
             {"PHP " +
-              ((parseInt(received) || 0) - totalAmount).toLocaleString()}
+              (
+                (parseFloat(received) || 0) - totalAmount
+              ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </td>
         </tr>
       </tbody>
