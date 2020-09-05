@@ -9,12 +9,15 @@ import {
   renderIconButton,
 } from "../common/renderForms";
 import Select from "../common/select";
+import Loader from "../common/loader";
 import TransactionItems from "./transactionItems";
 import { loadProducts } from "../../store/products";
 import {
   transactionErrorsSet,
-  clearErrors,
   generateTransactionId,
+  addTransaction,
+  successClosed,
+  errorsCleared,
 } from "../../store/transactions";
 import Summary from "./summary";
 import Payment from "./payment";
@@ -22,8 +25,22 @@ import Payment from "./payment";
 const Transaction = () => {
   const dispatch = useDispatch();
 
-  const { list: products } = useSelector((state) => state.entities.products);
-  const { currentNo, errors } = useSelector(
+  const initialValues = {
+    date: new Date().toDateString(),
+    items: [],
+    cashReceived: "",
+    amountSummary: {
+      discount: { label: "Total Discount", value: 0 },
+      vat: { label: "VAT", value: 0 },
+      subTotal: { label: "Sub-Total", value: 0 },
+      total: { label: "Total Sales", value: 0 },
+    },
+  };
+
+  const { list: products, productsLoading } = useSelector(
+    (state) => state.entities.products
+  );
+  const { currentNo, errors, loading, success } = useSelector(
     (state) => state.entities.transactions
   );
 
@@ -32,30 +49,16 @@ const Transaction = () => {
     value: p.barcode,
   }));
 
-  const [transaction, setTransaction] = useState({
-    date: new Date().toDateString(),
-    items: [],
-    cashReceived: 0,
-  });
+  const [transaction, setTransaction] = useState(initialValues);
 
   const [barcode, setBarcode] = useState("");
   const [selectedProduct, setSelectedProduct] = useState({});
-  const [amountSummary, setAmountSummary] = useState({
-    discount: { label: "Total Discount", value: 0 },
-    vat: { label: "VAT", value: 0 },
-    subTotal: { label: "Sub-Total", value: 0 },
-    total: { label: "Total Sales", value: 0 },
-  });
 
   useEffect(() => {
+    initializeValues();
     dispatch(loadProducts());
-    dispatch(generateTransactionId());
-    return () => dispatch(clearErrors());
+    return () => dispatch(errorsCleared());
   }, []);
-
-  useEffect(() => {
-    computeSummary();
-  }, [transaction]);
 
   const schema = {
     date: Joi.date().required().label("Date"),
@@ -70,7 +73,18 @@ const Transaction = () => {
         })
       )
       .min(1)
-      .label("Items"),
+      .label("Items")
+      .error(() => {
+        return {
+          message: "Please add items first.",
+        };
+      }),
+    cashReceived: Joi.string().required().label("Cash Received"),
+  };
+
+  const initializeValues = () => {
+    dispatch(generateTransactionId());
+    setTransaction(initialValues);
   };
 
   const handleChangeBarcode = (e) => {
@@ -138,13 +152,13 @@ const Transaction = () => {
       setTransaction(newTransaction);
     }
 
-    dispatch(clearErrors());
+    dispatch(errorsCleared());
   };
 
   const handleSubmitBarcode = ({ currentTarget: input, key }) => {
     if (key === "Enter") {
       addToItems(input.value);
-
+      computeSummary();
       setBarcode("");
     }
   };
@@ -157,6 +171,7 @@ const Transaction = () => {
 
   const handleAddProduct = () => {
     addToItems(selectedProduct.value);
+    computeSummary();
     setSelectedProduct({});
   };
 
@@ -165,13 +180,14 @@ const Transaction = () => {
 
     if (value < 0) return;
     newTransaction.items[index].qty = value;
-
+    computeSummary();
     setTransaction(newTransaction);
   };
 
   const handleChangeDiscount = (value, name, index) => {
     const newTransaction = { ...transaction };
     newTransaction.items[index][name] = value;
+    computeSummary();
     setTransaction(newTransaction);
   };
 
@@ -179,6 +195,7 @@ const Transaction = () => {
     const newTransaction = { ...transaction };
     newTransaction.items.splice(index, 1);
 
+    computeSummary();
     setTransaction(newTransaction);
     resetIndex();
   };
@@ -187,21 +204,21 @@ const Transaction = () => {
     const totalAmount = getTotalAmount();
     const totalDiscount = getTotalDiscount();
 
-    const newAmountSummary = { ...amountSummary };
+    const newTransaction = { ...transaction };
 
-    const { total, vat, subTotal, discount } = newAmountSummary;
+    const { total, vat, subTotal, discount } = newTransaction.amountSummary;
 
     discount.value = totalDiscount;
     total.value = totalAmount;
     vat.value = totalAmount * 0.12;
     subTotal.value = total.value - vat.value;
 
-    setAmountSummary(newAmountSummary);
+    setTransaction(newTransaction);
   };
 
-  const handleChangeCashReceived = (value) => {
+  const handleChangeCashReceived = ({ currentTarget: input }) => {
     const newTransaction = { ...transaction };
-    newTransaction.cashReceived = value;
+    newTransaction.cashReceived = input.value;
     setTransaction(newTransaction);
   };
 
@@ -216,80 +233,110 @@ const Transaction = () => {
     setTransaction(newTransaction);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const payload = {
       date: transaction.date,
-      cashReceived: transaction.cashReceived,
+      cashReceived: transaction.cashReceived.replace(/[^\d.-]/g, ""),
       items: transaction.items,
     };
 
     let formErrors = validate(payload, schema) || {};
 
-    if (transaction.cashReceived < totalAmount)
+    if (parseFloat(transaction.cashReceived) < totalAmount)
       formErrors.cashReceived = "Enter the right amount";
 
-    if (formErrors) console.log(formErrors);
-
     dispatch(transactionErrorsSet({ errors: formErrors || {} }));
+
+    if (Object.keys(formErrors).length !== 0) return;
+
+    await dispatch(addTransaction(payload));
+    dispatch(errorsCleared());
+    initializeValues();
   };
 
   return (
     <>
       <PageTitle title="Transaction" />
+      {errors.apiError.message && (
+        <div className="statusBox red white-text center">
+          {errors.apiError.message}
+        </div>
+      )}
+      {success && (
+        <div className="statusBox green white-text center">
+          Transaction Completed. Print receipt <a href="#">here</a>
+          <span
+            className="badge white-text"
+            style={{ cursor: "pointer" }}
+            onClick={() => dispatch(successClosed())}
+          >
+            <i className="material-icons">close</i>
+          </span>
+        </div>
+      )}
+      {(loading || productsLoading) && <Loader className="left-align" />}
       <div className="row">
         <div className="col s12">
-          {renderInput({
-            name: "transactionNo",
-            label: "Transaction No.",
-            customClass: "col s4",
-            disableRow: true,
-            value: currentNo || "",
-            readOnly: true,
-          })}
-          <div className="col s6"></div>
-          {renderInput({
-            name: "date",
-            label: "Transaction Date.",
-            customClass: "col s2",
-            disableRow: true,
-            defaultValue: transaction.date,
-            readOnly: true,
-          })}
-          {renderInput({
-            name: "barcode",
-            label: "Barcode",
-            placeholder: "Scan Barcode Here...",
-            customClass: "col s4",
-            disableRow: true,
-            data: barcode,
-            error: errors.formErrors["barcode"],
-            autoComplete: "off",
-            onChange: handleChangeBarcode,
-            onKeyDown: handleSubmitBarcode,
-          })}
-          <div className="col s3"></div>
-          <div className="col s5">
-            <div className="row" style={{ display: "flex" }}>
-              <div className="col s8">
-                <Select
-                  options={productsOptions}
-                  placeHolder="Select item"
-                  label="Manual Add"
-                  wrappedInRow={false}
-                  value={selectedProduct}
-                  onChange={(selectedItem) => setSelectedProduct(selectedItem)}
-                  error={errors.formErrors["barcode"]}
-                  tableItem
-                />
-              </div>
-              <div
-                className="col"
-                style={{ display: "flex", alignItems: "flex-end" }}
-              >
-                {renderButton("Add", (e) => handleAddProduct(e))}
+          <div className="row">
+            {renderInput({
+              name: "transactionNo",
+              label: "Transaction No.",
+              customClass: "col s4",
+              disableRow: true,
+              value: currentNo || "",
+              readOnly: true,
+            })}
+            <div className="col s6"></div>
+            {renderInput({
+              name: "date",
+              label: "Transaction Date.",
+              customClass: "col s2",
+              disableRow: true,
+              defaultValue: transaction.date,
+              readOnly: true,
+            })}
+          </div>
+
+          <div className="row">
+            {renderInput({
+              name: "barcode",
+              label: "Barcode",
+              placeholder: "Scan Barcode Here...",
+              customClass: "col s4",
+              disableRow: true,
+              data: barcode,
+              error: errors.formErrors["barcode"],
+              autoComplete: "off",
+              onChange: handleChangeBarcode,
+              onKeyDown: handleSubmitBarcode,
+            })}
+            <div className="col s3"></div>
+            <div className="col s5">
+              <div className="row" style={{ display: "flex" }}>
+                <div className="col s8">
+                  <Select
+                    options={productsOptions}
+                    placeHolder="Select item"
+                    label="Manual Add"
+                    wrappedInRow={false}
+                    value={selectedProduct}
+                    onChange={(selectedItem) =>
+                      setSelectedProduct(selectedItem)
+                    }
+                    error={errors.formErrors["barcode"]}
+                    tableItem
+                  />
+                </div>
+                <div
+                  className="col"
+                  style={{ display: "flex", alignItems: "flex-end" }}
+                >
+                  {renderButton("Add", (e) => handleAddProduct(e))}
+                </div>
               </div>
             </div>
           </div>
+
           <div className="row">
             <div className="col s12" style={{ minHeight: "300px" }}>
               <TransactionItems
@@ -298,6 +345,11 @@ const Transaction = () => {
                 onDelete={handleRemoveItem}
                 onChangeDiscount={handleChangeDiscount}
               />
+              {errors.formErrors.items && (
+                <div className="statusBox red white-text center">
+                  {errors.formErrors.items}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -312,7 +364,7 @@ const Transaction = () => {
           </div>
           <div className="col s4"></div>
           <div className="col s4">
-            <Summary data={amountSummary} />
+            <Summary data={transaction.amountSummary} />
           </div>
         </div>
         {renderIconButton("New", handleSubmit, "add", "large", "blue")}

@@ -1,5 +1,7 @@
 import React from "react";
 import Input from "./input";
+import ConditionalWrapper from "./conditionalWrapper";
+import Loader from "./loader";
 
 export const renderInput = ({
   name,
@@ -11,7 +13,10 @@ export const renderInput = ({
   disableRow = false,
   ...rest
 }) => (
-  <div className={disableRow ? "" : "row"}>
+  <ConditionalWrapper
+    condition={!disableRow}
+    wrapper={(children) => <div className="row">{children}</div>}
+  >
     <Input
       label={label}
       placeholder={placeholder || ""}
@@ -21,7 +26,7 @@ export const renderInput = ({
       error={error}
       {...rest}
     />
-  </div>
+  </ConditionalWrapper>
 );
 
 export const renderButton = (label, onClick, customClass) => (

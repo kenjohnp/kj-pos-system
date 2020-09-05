@@ -1,8 +1,27 @@
 import React from "react";
-import { renderInput } from "../common/renderForms";
+import Input from "../common/input";
 import CurrencyInput from "react-currency-input-field";
+import MaskedInput from "react-text-mask";
+import createNumberMask from "text-mask-addons/dist/createNumberMask";
 
 const Payment = ({ received, onChange, totalAmount, error }) => {
+  const defaultMaskOptions = {
+    prefix: "PHP ",
+    suffix: "",
+    includeThousandsSeparator: true,
+    thousandsSeparatorSymbol: ",",
+    allowDecimal: true,
+    decimalSymbol: ".",
+    decimalLimit: 2, // how many digits allowed after the decimal
+    integerLimit: 7, // limit length of integer numbers
+    allowNegative: false,
+    allowLeadingZeroes: false,
+  };
+
+  const currencyMask = createNumberMask({
+    ...defaultMaskOptions,
+  });
+
   return (
     <table>
       <tbody>
@@ -11,13 +30,14 @@ const Payment = ({ received, onChange, totalAmount, error }) => {
             <b>Payments Received (Cash)</b>
           </td>
           <td>
-            <CurrencyInput
+            <MaskedInput
+              mask={currencyMask}
               name="cashReceived"
-              placeholder="PHP 0.00"
-              prefix="PHP "
               value={received}
               onChange={onChange}
+              placeholder="0.00"
             />
+
             {error && <span className="red-text">{error}</span>}
           </td>
         </tr>
@@ -32,7 +52,8 @@ const Payment = ({ received, onChange, totalAmount, error }) => {
           <td>
             {"PHP " +
               (
-                (parseFloat(received) || 0) - totalAmount
+                (parseFloat(String(received).replace(/[^\d.-]/g, "")) || 0) -
+                totalAmount
               ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </td>
         </tr>

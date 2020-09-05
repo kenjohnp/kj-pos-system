@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { apiCallBegan } from "./api";
-import { setApiError } from "./stockEntries";
 
 const slice = createSlice({
   name: "transactions",
@@ -18,6 +17,7 @@ const slice = createSlice({
   reducers: {
     idAdded: (transactions, action) => {
       transactions.currentNo = action.payload;
+      transactions.loading = false;
     },
     transactionsRequested: (transactions, action) => {
       transactions.loading = true;
@@ -34,6 +34,7 @@ const slice = createSlice({
     transactionAdded: (transactions, action) => {
       transactions.list.push(action.payload);
       transactions.loading = false;
+      transactions.success = true;
     },
     transactionErrorsSet: (transactions, action) => {
       transactions.errors.formErrors = action.payload.errors;
@@ -43,6 +44,13 @@ const slice = createSlice({
         formErrors: {},
         apiError: {},
       };
+    },
+    setApiError: (transactions, action) => {
+      transactions.errors.apiError = action.payload.errors;
+      transactions.loading = false;
+    },
+    successClosed: (transactions, action) => {
+      transactions.success = false;
     },
   },
 });
@@ -55,6 +63,8 @@ export const {
   transactionAdded,
   transactionErrorsSet,
   errorsCleared,
+  setApiError,
+  successClosed,
 } = slice.actions;
 
 export default slice.reducer;
@@ -71,4 +81,12 @@ export const generateTransactionId = () =>
     onError: setApiError.type,
   });
 
-export const clearErrors = () => (dispatch) => dispatch(errorsCleared());
+export const addTransaction = (transaction) =>
+  apiCallBegan({
+    url,
+    method: "post",
+    data: transaction,
+    onStart: transactionsRequested.type,
+    onSuccess: transactionAdded.type,
+    onError: setApiError.type,
+  });
