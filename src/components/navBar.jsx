@@ -27,6 +27,11 @@ const NavBar = () => {
                     <NavLink to="/transaction">Transaction</NavLink>
                   </li>
                   <li>
+                    <NavLink to="/transactionsHistory">
+                      Transactions History
+                    </NavLink>
+                  </li>
+                  <li>
                     <NavLink to="/users">Users</NavLink>
                   </li>
                   <li>

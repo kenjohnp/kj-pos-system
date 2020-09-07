@@ -86,6 +86,16 @@ const slice = createSlice({
     setSuccess: (products, action) => {
       products.success = action.payload;
     },
+    stockDecremented: (products, action) => {
+      const { items } = action.payload;
+
+      let index;
+
+      for (let i = 0; i < items.length; i++) {
+        index = products.list.findIndex((p) => p._id === items[i].productId);
+        if (index > -1) products.list[index].inStock -= items[i].qty;
+      }
+    },
   },
 });
 
@@ -102,6 +112,7 @@ export const {
   selectedProductCleared,
   setApiError,
   setSuccess,
+  stockDecremented,
 } = slice.actions;
 
 export default slice.reducer;

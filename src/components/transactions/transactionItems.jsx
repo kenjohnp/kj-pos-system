@@ -2,7 +2,7 @@ import React from "react";
 import Table from "../common/table";
 import Input from "../common/input";
 import FloatingButton from "../common/floatingButton";
-import CurrencyInput from "react-currency-input-field";
+import CurrencyInput from "../common/currencyInput";
 
 const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
   const columns = [
@@ -22,6 +22,13 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
       content: (item) => renderInput("price", item),
     },
     {
+      label: "In Stock",
+      path: "currentQty",
+      style: { textAlign: "right" },
+      width: "10%",
+      content: (item) => renderInput("currentQty", item),
+    },
+    {
       label: "Qty",
       path: "qty",
       style: { textAlign: "right" },
@@ -33,8 +40,11 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
           type="number"
           customClass="m-0"
           min={1}
+          max={item.currentQty}
           style={{ textAlign: "right" }}
-          onChange={(e) => onChange(item.index, e.currentTarget.value)}
+          onChange={(e) =>
+            onChange(item.index, e.currentTarget.value, item.currentQty)
+          }
           onKeyPress={(e) => preventNegative(e)}
         />
       ),
@@ -50,7 +60,7 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
           placeholder="0.00"
           prefix=""
           value={item.discount}
-          onChange={(value, name) => onChangeDiscount(value, name, item.index)}
+          onChange={(e) => onChangeDiscount(e, item)}
           style={{ textAlign: "right" }}
         />
       ),
@@ -62,7 +72,9 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
       width: "15%",
       content: (item) =>
         renderInput("totalAmount", {
-          totalAmount: item.qty * (item.price - (item.discount || 0)),
+          totalAmount:
+            item.qty *
+            (item.price - (item.discount.replace(/[^\d.-]/g, "") || 0)),
           index: item.index,
         }),
     },
@@ -83,6 +95,7 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
       name={path + item.index}
       value={item[path] || "0.00"}
       customclass="m-0"
+      prefix=""
       style={{ textAlign: "right" }}
       readOnly
     />

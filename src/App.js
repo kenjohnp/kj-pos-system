@@ -16,6 +16,7 @@ import SupplierForm from "./components/suppliers/supplierForm";
 import StockEntries from "./components/stockEntries/stockEntries";
 import StockEntryForm from "./components/stockEntries/stockEntryForm";
 import Transaction from "./components/transactions/transaction";
+import TransactionsHistory from "./components/transactions/history";
 import Login from "./components/login";
 import Logout from "./components/common/logout";
 import { Route, Switch, Redirect } from "react-router-dom";
@@ -58,6 +59,10 @@ function App() {
             />
             <ProtectedRoute path="/stockentries" component={StockEntries} />
             <ProtectedRoute path="/transaction" component={Transaction} />
+            <ProtectedRoute
+              path="/transactionsHistory"
+              component={TransactionsHistory}
+            />
             <ProtectedRoute path="/" exact component={Users} />
           </Switch>
         </div>

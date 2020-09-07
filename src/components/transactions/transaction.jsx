@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Joi from "joi-browser";
+import { toast } from "react-toastify";
 import validate from "../../utils/validate";
 import PageTitle from "../common/pageTitle";
 import {
@@ -11,7 +12,7 @@ import {
 import Select from "../common/select";
 import Loader from "../common/loader";
 import TransactionItems from "./transactionItems";
-import { loadProducts } from "../../store/products";
+import { loadProducts, stockDecremented } from "../../store/products";
 import {
   transactionErrorsSet,
   generateTransactionId,
@@ -46,7 +47,7 @@ const Transaction = () => {
 
   const productsOptions = products.map((p) => ({
     label: p.description,
-    value: p.barcode,
+    value: p._id,
   }));
 
   const [transaction, setTransaction] = useState(initialValues);
@@ -67,19 +68,15 @@ const Transaction = () => {
         Joi.object({
           barcode: Joi.string().allow("").label("Barcode"),
           itemName: Joi.string().required().label("Item Name"),
+          productId: Joi.string().required().label("Product ID"),
           price: Joi.number().min(1).required().label("Price"),
           qty: Joi.number().min(1).required().label("Qty"),
           discount: Joi.number().min(0).required().label("Discount"),
         })
       )
       .min(1)
-      .label("Items")
-      .error(() => {
-        return {
-          message: "Please add items first.",
-        };
-      }),
-    cashReceived: Joi.string().required().label("Cash Received"),
+      .label("Product"),
+    cashReceived: Joi.number().min(0).required().label("Cash Received"),
   };
 
   const initializeValues = () => {
@@ -103,8 +100,10 @@ const Transaction = () => {
     setBarcode("");
   };
 
-  const validateBarcode = (barcode) => {
-    const product = products.find((p) => p.barcode === barcode);
+  const validateProduct = (item) => {
+    const product = products.find(
+      (p) => p.barcode === item.barcode || p._id === item.productId
+    );
 
     if (!product)
       return setBarcodeErrors("Barcode/Product not found in the database.");
@@ -114,40 +113,42 @@ const Transaction = () => {
     return product;
   };
 
-  const getExistingProduct = (barcode) => {
-    return transaction.items.find((i) => i.barcode === barcode);
+  const addToItems = (item) => {
+    const product = validateProduct({
+      barcode: item.barcode,
+      productId: item.productId,
+    });
+
+    if (product) addProduct(item, product);
   };
 
-  const getTotalAmount = () =>
-    transaction.items.reduce(
-      (a, b) => a + (b.qty || 0) * (b.price - (parseFloat(b.discount) || 0)),
-      0
-    );
-
-  const getTotalDiscount = () =>
-    transaction.items.reduce((a, b) => a + (parseFloat(b.discount) || 0), 0);
-
-  const addProduct = (barcode, product) => {
-    const { description, price } = product;
+  const addProduct = (item, product) => {
+    const { description, price, barcode } = product;
 
     const newTransaction = { ...transaction };
 
-    const existingProduct = getExistingProduct(barcode);
+    const existingProduct = getExistingProduct({
+      barcode: item.barcode,
+      productId: item.productId,
+    });
 
     if (existingProduct) {
       if (product.inStock <= existingProduct.qty)
         return setBarcodeErrors("Out of stock.");
 
       newTransaction.items[existingProduct.index].qty += 1;
+
       setTransaction(newTransaction);
     } else {
       newTransaction.items.push({
         index: transaction.items.length,
-        barcode,
+        barcode: barcode,
+        productId: product._id,
         itemName: description,
         price,
         qty: 1,
-        discount: 0,
+        currentQty: product.inStock,
+        discount: "",
       });
       setTransaction(newTransaction);
     }
@@ -155,38 +156,65 @@ const Transaction = () => {
     dispatch(errorsCleared());
   };
 
+  const getExistingProduct = (product) => {
+    return transaction.items.find(
+      (i) => i.barcode === product.barcode || i.productId === product.productId
+    );
+  };
+
+  const handleAddProduct = () => {
+    addToItems({ productId: selectedProduct.value });
+    computeSummary();
+    setSelectedProduct({});
+  };
+
+  const getTotalAmount = () =>
+    transaction.items.reduce(
+      (a, b) =>
+        a +
+        (b.qty || 0) *
+          (b.price - (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0)),
+      0
+    );
+
+  const getTotalDiscount = () =>
+    transaction.items.reduce(
+      (a, b) => a + (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0),
+      0
+    );
+
   const handleSubmitBarcode = ({ currentTarget: input, key }) => {
     if (key === "Enter") {
-      addToItems(input.value);
+      addToItems({ barcode: input.value });
       computeSummary();
       setBarcode("");
     }
   };
 
-  const addToItems = (value) => {
-    const product = validateBarcode(value);
-
-    if (product) addProduct(value, product);
-  };
-
-  const handleAddProduct = () => {
-    addToItems(selectedProduct.value);
-    computeSummary();
-    setSelectedProduct({});
-  };
-
-  const handleChangeQty = (index, value) => {
+  const handleChangeQty = (index, value, currentQty) => {
     const newTransaction = { ...transaction };
 
-    if (value < 0) return;
-    newTransaction.items[index].qty = value;
+    if (value < 0 || value > currentQty)
+      return toast.error("Qty must not exceed current stock");
+
+    newTransaction.items[index].qty =
+      typeof value === "string" ? parseInt(value) : value;
+
     computeSummary();
     setTransaction(newTransaction);
   };
 
-  const handleChangeDiscount = (value, name, index) => {
+  const handleChangeDiscount = ({ currentTarget: input }, item) => {
     const newTransaction = { ...transaction };
-    newTransaction.items[index][name] = value;
+
+    let discount = input.value.replace(/[^\d.-]/g, "");
+
+    if (item.price < discount) {
+      toast.error("Discount must be not greater than the Price.");
+      discount = "";
+    }
+
+    newTransaction.items[item.index].discount = discount;
     computeSummary();
     setTransaction(newTransaction);
   };
@@ -234,23 +262,37 @@ const Transaction = () => {
   };
 
   const handleSubmit = async () => {
+    const transactionItems = transaction.items.map((i) => ({
+      barcode: i.barcode,
+      productId: i.productId,
+      itemName: i.itemName,
+      price: i.price,
+      qty: i.qty,
+      discount: parseFloat(i.discount) || 0,
+    }));
+
+    const cashReceived = parseFloat(
+      transaction.cashReceived.replace(/[^\d.-]/g, "")
+    );
+
     const payload = {
       date: transaction.date,
-      cashReceived: transaction.cashReceived.replace(/[^\d.-]/g, ""),
-      items: transaction.items,
+      cashReceived,
+      items: transactionItems,
     };
 
     let formErrors = validate(payload, schema) || {};
 
-    if (parseFloat(transaction.cashReceived) < totalAmount)
-      formErrors.cashReceived = "Enter the right amount";
+    if (cashReceived < totalAmount)
+      formErrors.cashReceived = "Insufficient Amount";
 
     dispatch(transactionErrorsSet({ errors: formErrors || {} }));
 
     if (Object.keys(formErrors).length !== 0) return;
 
     await dispatch(addTransaction(payload));
-    dispatch(errorsCleared());
+    await dispatch(stockDecremented({ items: transactionItems }));
+
     initializeValues();
   };
 
