@@ -200,7 +200,7 @@ const StockEntryForm = ({ match }) => {
     <>
       {(redirect || success) && <Redirect to="/stockEntries" />}
       <PageTitle title="New Stock Entry" />
-      {loading && <Loader className="left-align" />}
+      <Loader className="left-align" loading={loading} />
       <div className="row">
         <form className="col s8">
           {errors.apiError.message && (

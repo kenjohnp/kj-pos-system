@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { apiCallBegan } from "./api";
+import moment from "moment";
 
 const slice = createSlice({
   name: "transactions",
@@ -80,6 +81,23 @@ export const generateTransactionId = () =>
     onSuccess: idAdded.type,
     onError: setApiError.type,
   });
+
+export const loadTransactions = () => (dispatch, getState) => {
+  const { lastFetch } = getState().entities.transactions;
+
+  const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
+
+  if (diffInMinutes < 10) return;
+
+  return dispatch(
+    apiCallBegan({
+      url,
+      onStart: transactionsRequested.type,
+      onSuccess: transactionsReceived.type,
+      onError: transactionsRequestFailed.type,
+    })
+  );
+};
 
 export const addTransaction = (transaction) =>
   apiCallBegan({

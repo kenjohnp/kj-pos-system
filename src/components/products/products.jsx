@@ -111,7 +111,7 @@ const Products = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
-      {loading && <Loader />}
+      <Loader loading={loading} />
       <ProductsTable
         products={data}
         sortColumn={sortColumn}

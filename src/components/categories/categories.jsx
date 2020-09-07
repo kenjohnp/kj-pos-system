@@ -114,7 +114,7 @@ const Categories = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={(e) => handleChange(e)} />
       </div>
-      {loading && <Loader />}
+      <Loader loading={loading} />
       <CategoriesTable
         categories={data}
         sortColumn={sortColumn}

@@ -75,7 +75,7 @@ const StockEntries = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
-      {loading && <Loader />}
+      <Loader loading={loading} />
       <StockEntriesTable
         stockEntries={data}
         sortColumn={sortColumn}

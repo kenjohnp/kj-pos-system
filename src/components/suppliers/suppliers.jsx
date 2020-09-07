@@ -110,7 +110,7 @@ const Suppliers = () => {
         </div>
         <Search searchQuery={searchQuery} onChange={handleChange} />
       </div>
-      {loading && <Loader />}
+      <Loader loading={loading} />
       <SuppliersTable
         suppliers={data}
         sortColumn={sortColumn}

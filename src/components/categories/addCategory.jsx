@@ -46,7 +46,7 @@ const AddCategory = () => {
     <Fragment>
       {(redirect || success) && <Redirect to="/categories" />}
       <PageTitle title="Add Category" />
-      {loading && <Loader className="left-align" />}
+      <Loader className="left-align" loading={loading} />
       <div className="row">
         <form className="col s8">
           {errors.apiError.message && (

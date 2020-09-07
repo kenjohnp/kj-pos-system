@@ -124,7 +124,7 @@ const ProductForm = ({ match }) => {
       <PageTitle
         title={match.params.id === "new" ? "New Product" : "Edit Product"}
       />
-      {loading && <Loader className="left-align" />}
+      <Loader className="left-align" loading={loading} />
       <div className="row">
         <form className="col s8">
           {errors.apiError.message && (

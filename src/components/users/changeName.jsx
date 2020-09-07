@@ -77,7 +77,7 @@ const ChangeName = ({ match }) => {
         </div>
       )}
       {console.log("loading:", loading)}
-      {loading && <Loader className="left-align" />}
+      <Loader className="left-align" loading={loading} />
       <div className="row">
         <form className="col s8">
           {renderInput({

@@ -38,7 +38,7 @@ const Transaction = () => {
     },
   };
 
-  const { list: products, productsLoading } = useSelector(
+  const { list: products, loading: productsLoading } = useSelector(
     (state) => state.entities.products
   );
   const { currentNo, errors, loading, success } = useSelector(
@@ -296,6 +296,41 @@ const Transaction = () => {
     initializeValues();
   };
 
+  const handleClickNew = () => {};
+
+  const buttonGroup = [
+    {
+      label: "New",
+      icon: "add",
+      color: "blue",
+      onClick: handleClickNew,
+    },
+    {
+      label: "Cancel",
+      icon: "cancel",
+      color: "red",
+      onClick: handleClickNew,
+    },
+    {
+      label: "Print Receipt",
+      icon: "print",
+      color: "teal",
+      onClick: handleClickNew,
+    },
+    {
+      label: "History",
+      icon: "save",
+      color: "grey",
+      link: "/transactionsHistory",
+    },
+    {
+      label: "Finish",
+      icon: "save",
+      color: "green",
+      onClick: handleSubmit,
+    },
+  ];
+
   return (
     <>
       <PageTitle title="Transaction" />
@@ -316,7 +351,7 @@ const Transaction = () => {
           </span>
         </div>
       )}
-      {(loading || productsLoading) && <Loader className="left-align" />}
+      <Loader className="left-align" loading={loading || productsLoading} />
       <div className="row">
         <div className="col s12">
           <div className="row">
@@ -409,17 +444,9 @@ const Transaction = () => {
             <Summary data={transaction.amountSummary} />
           </div>
         </div>
-        {renderIconButton("New", handleSubmit, "add", "large", "blue")}
-        {renderIconButton("Cancel", handleSubmit, "cancel", "large", "red")}
-        {renderIconButton(
-          "Print Receipt",
-          handleSubmit,
-          "print",
-          "large",
-          "teal"
+        {buttonGroup.map((b) =>
+          renderIconButton(b.label, b.onClick, b.icon, b.size, b.color, b.link)
         )}
-        {renderIconButton("History", handleSubmit, "save", "large", "grey")}
-        {renderIconButton("Finish", handleSubmit, "save", "large", "green")}
       </div>
     </>
   );

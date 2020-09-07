@@ -56,15 +56,16 @@ const UsersTable = ({ users, onSort, sortColumn, onDelete, onChange }) => {
     },
   ];
 
-  return loading ? (
-    <Loader />
-  ) : (
-    <Table
-      columns={columns}
-      data={users}
-      sortColumn={sortColumn}
-      onSort={onSort}
-    />
+  return (
+    <>
+      <Loader loading={loading} />
+      <Table
+        columns={columns}
+        data={users}
+        sortColumn={sortColumn}
+        onSort={onSort}
+      />
+    </>
   );
 };
 

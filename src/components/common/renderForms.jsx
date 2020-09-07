@@ -1,7 +1,7 @@
 import React from "react";
 import Input from "./input";
 import ConditionalWrapper from "./conditionalWrapper";
-import Loader from "./loader";
+import { Link } from "react-router-dom";
 
 export const renderInput = ({
   name,
@@ -40,17 +40,21 @@ export const renderIconButton = (
   onClick,
   icon,
   size = "large",
-  customClass
+  color = "grey",
+  link = "#"
 ) => (
-  <a
-    className={`waves-effect waves-light btn-${size} ${customClass}`}
+  <Link
+    className={`waves-effect waves-light btn-${size} ${color}`}
     style={{ marginRight: "5px" }}
     onClick={onClick}
+    to={link}
+    key={label}
   >
     <i className="material-icons left">{icon}</i>
     {label}
-  </a>
+  </Link>
 );
+
 export const renderRadioButton = (name, label, checked, onChange) => (
   <p>
     <label>

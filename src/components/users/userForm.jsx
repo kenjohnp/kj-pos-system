@@ -83,7 +83,7 @@ const UserForm = () => {
     <Fragment>
       {(redirectToUsers || success) && <Redirect to="/users" />}
       <PageTitle title="New User" />
-      {loading && <Loader className="left-align" />}
+      <Loader className="left-align" loading={loading} />
       <div className="row">
         <form className="col s8">
           {errors.apiError.message && (
