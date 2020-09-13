@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import auth from "../services/authService";
 
 const NavBar = () => {
@@ -7,18 +7,18 @@ const NavBar = () => {
     <nav>
       <div className="nav-wrapper green">
         {auth.getCurrentUser() && (
-          <a
-            href="#"
+          <Link
+            to="#"
             data-target="slide-out"
             className="sidenav-trigger show-on-large"
           >
             <i className="material-icons">menu</i>
-          </a>
+          </Link>
         )}
         <div className="container">
-          <a href="#" className="brand-logo">
+          <Link to="/transaction" className="brand-logo">
             KJ POS
-          </a>
+          </Link>
           {auth.getCurrentUser() && (
             <ul id="nav-mobile" className="right hide-on-med-and-down">
               {auth.getCurrentUser().isAdmin && (

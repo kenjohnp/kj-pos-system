@@ -36,7 +36,7 @@ const Users = () => {
     return () => {
       dispatch(clearErrors());
     };
-  }, []);
+  }, [dispatch]);
 
   const handleDelete = (userId) => {
     setIsModalOpen(true);

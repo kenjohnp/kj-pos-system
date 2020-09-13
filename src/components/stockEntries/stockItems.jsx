@@ -10,15 +10,16 @@ const StockItems = ({ items, onChange, onDelete, readOnly }) => {
 
   const [productsOptions, setProductsOptions] = useState([]);
 
-  const initialOptions = () => {
-    return products.map((p) => ({
-      label: p.description,
-      value: p._id,
-    }));
-  };
-
   useEffect(() => {
-    setProductsOptions(initialOptions());
+    const setInitialOptions = () => {
+      const newProductsOptions = products.map((p) => ({
+        label: p.description,
+        value: p._id,
+      }));
+      setProductsOptions(newProductsOptions);
+    };
+
+    setInitialOptions();
   }, [products]);
 
   const filterSelected = () => {
@@ -26,11 +27,9 @@ const StockItems = ({ items, onChange, onDelete, readOnly }) => {
 
     for (let i = 0; i < items.length; i++) selectedItems.push(items[i].item);
 
-    const newProductOptions = initialOptions().filter(
+    const newProductOptions = productsOptions.filter(
       (i) => !selectedItems.find((s) => s.value === i.value)
     );
-
-    console.log(selectedItems);
 
     setProductsOptions(newProductOptions);
   };
@@ -47,7 +46,6 @@ const StockItems = ({ items, onChange, onDelete, readOnly }) => {
           placeHolder="Select item"
           tableItem
           onChange={(selectedItem) => {
-            const currentItem = item.item;
             onChange("item", item.index, selectedItem);
             filterSelected();
           }}

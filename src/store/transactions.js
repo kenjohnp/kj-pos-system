@@ -6,6 +6,7 @@ const slice = createSlice({
   name: "transactions",
   initialState: {
     list: [],
+    selectedTransaction: {},
     currentNo: null,
     loading: false,
     lastFetch: null,
@@ -22,6 +23,40 @@ const slice = createSlice({
     },
     transactionsRequested: (transactions, action) => {
       transactions.loading = true;
+    },
+    transactionReceived: (transactions, action) => {
+      transactions.selectedTransaction = action.payload;
+      const {
+        totalAmount,
+        vat,
+        subTotal,
+        totalDiscount,
+      } = action.payload.amountSummary;
+
+      const { items } = transactions.selectedTransaction;
+
+      for (let i = 0; i < items.length; i++) {
+        items[i].index = i;
+        items[i].discount = items[i].discount.toString();
+      }
+
+      transactions.selectedTransaction.amountSummary = {
+        discount: {
+          label: "Total Discount",
+          value: totalDiscount,
+        },
+        vat: { label: "VAT", value: vat },
+        subTotal: {
+          label: "Sub-Total",
+          value: subTotal,
+        },
+        total: {
+          label: "Total Sales",
+          value: totalAmount,
+        },
+      };
+
+      transactions.loading = false;
     },
     transactionsReceived: (transactions, action) => {
       transactions.list = action.payload;
@@ -59,6 +94,7 @@ const slice = createSlice({
 export const {
   idAdded,
   transactionsRequested,
+  transactionReceived,
   transactionsReceived,
   transactionsRequestFailed,
   transactionAdded,
@@ -106,5 +142,13 @@ export const addTransaction = (transaction) =>
     data: transaction,
     onStart: transactionsRequested.type,
     onSuccess: transactionAdded.type,
+    onError: setApiError.type,
+  });
+
+export const getTransaction = (id) =>
+  apiCallBegan({
+    url: `${url}/${id}`,
+    onStart: transactionsRequested.type,
+    onSuccess: transactionReceived.type,
     onError: setApiError.type,
   });

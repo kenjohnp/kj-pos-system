@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import _ from "lodash";
 import Joi from "joi-browser";
 import { toast } from "react-toastify";
 import validate from "../../utils/validate";
@@ -19,11 +21,12 @@ import {
   addTransaction,
   successClosed,
   errorsCleared,
+  getTransaction,
 } from "../../store/transactions";
 import Summary from "./summary";
 import Payment from "./payment";
 
-const Transaction = () => {
+const Transaction = ({ match }) => {
   const dispatch = useDispatch();
 
   const initialValues = {
@@ -41,9 +44,13 @@ const Transaction = () => {
   const { list: products, loading: productsLoading } = useSelector(
     (state) => state.entities.products
   );
-  const { currentNo, errors, loading, success } = useSelector(
-    (state) => state.entities.transactions
-  );
+  const {
+    currentNo,
+    errors,
+    loading,
+    success,
+    selectedTransaction,
+  } = useSelector((state) => state.entities.transactions);
 
   const productsOptions = products.map((p) => ({
     label: p.description,
@@ -54,12 +61,28 @@ const Transaction = () => {
 
   const [barcode, setBarcode] = useState("");
   const [selectedProduct, setSelectedProduct] = useState({});
+  const [readOnly, setReadOnly] = useState(false);
 
   useEffect(() => {
     initializeValues();
-    dispatch(loadProducts());
+
+    if (!_.isEmpty(match.params)) {
+      dispatch(getTransaction(match.params.id));
+      setReadOnly(true);
+    } else {
+      dispatch(loadProducts());
+    }
     return () => dispatch(errorsCleared());
-  }, []);
+  }, [dispatch, match.params]);
+
+  useEffect(() => {
+    if (!_.isEmpty(selectedTransaction) && match.params.id) {
+      const newTransaction = { ...selectedTransaction };
+      newTransaction.date = new Date(selectedTransaction.date);
+
+      setTransaction(newTransaction);
+    }
+  }, [selectedTransaction, match.params.id]);
 
   const schema = {
     date: Joi.date().required().label("Date"),
@@ -169,13 +192,13 @@ const Transaction = () => {
   };
 
   const getTotalAmount = () =>
-    transaction.items.reduce(
-      (a, b) =>
+    transaction.items.reduce((a, b) => {
+      return (
         a +
         (b.qty || 0) *
-          (b.price - (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0)),
-      0
-    );
+          (b.price - (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0))
+      );
+    }, 0);
 
   const getTotalDiscount = () =>
     transaction.items.reduce(
@@ -223,7 +246,6 @@ const Transaction = () => {
     const newTransaction = { ...transaction };
     newTransaction.items.splice(index, 1);
 
-    computeSummary();
     setTransaction(newTransaction);
     resetIndex();
   };
@@ -250,8 +272,6 @@ const Transaction = () => {
     setTransaction(newTransaction);
   };
 
-  const totalAmount = getTotalAmount();
-
   const resetIndex = () => {
     const newTransaction = { ...transaction };
 
@@ -260,6 +280,8 @@ const Transaction = () => {
 
     setTransaction(newTransaction);
   };
+
+  const totalAmount = getTotalAmount();
 
   const handleSubmit = async () => {
     const transactionItems = transaction.items.map((i) => ({
@@ -296,7 +318,9 @@ const Transaction = () => {
     initializeValues();
   };
 
-  const handleClickNew = () => {};
+  const handleClickNew = () => {
+    initializeValues();
+  };
 
   const buttonGroup = [
     {
@@ -304,6 +328,7 @@ const Transaction = () => {
       icon: "add",
       color: "blue",
       onClick: handleClickNew,
+      link: "/transaction",
     },
     {
       label: "Cancel",
@@ -341,7 +366,7 @@ const Transaction = () => {
       )}
       {success && (
         <div className="statusBox green white-text center">
-          Transaction Completed. Print receipt <a href="#">here</a>
+          Transaction Completed. Print receipt <Link to="#">here</Link>
           <span
             className="badge white-text"
             style={{ cursor: "pointer" }}
@@ -360,7 +385,7 @@ const Transaction = () => {
               label: "Transaction No.",
               customClass: "col s4",
               disableRow: true,
-              value: currentNo || "",
+              value: transaction.transactionNo || currentNo || "",
               readOnly: true,
             })}
             <div className="col s6"></div>

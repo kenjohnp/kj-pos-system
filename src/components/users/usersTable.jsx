@@ -45,12 +45,13 @@ const UsersTable = ({ users, onSort, sortColumn, onDelete, onChange }) => {
           >
             Change Name
           </Link>
-          <a
+          <Link
+            to="#"
             className="btn-floating waves-effect waves-light red ml-1"
             onClick={() => onDelete(user._id)}
           >
             <i className="material-icons">delete</i>
-          </a>
+          </Link>
         </React.Fragment>
       ),
     },

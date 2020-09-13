@@ -56,19 +56,15 @@ const StockEntryForm = ({ match }) => {
       dispatch(clearErrors());
       dispatch(clearSelectedStockEntry());
     };
-  }, []);
+  }, [dispatch, match.params.id]);
 
   useEffect(() => {
-    mapSelectedToState();
-  }, [selectedStockEntry]);
-
-  const mapSelectedToState = () => {
     if (!_.isEmpty(selectedStockEntry) && match.params.id !== "new") {
       const newStockEntry = { ...selectedStockEntry };
       newStockEntry.date = new Date(selectedStockEntry.date);
       setStockEntry(newStockEntry);
     }
-  };
+  }, [selectedStockEntry, match.params.id]);
 
   const schema = {
     supplier: Joi.object({

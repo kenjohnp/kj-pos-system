@@ -10,9 +10,9 @@ const FloatingButton = ({ onClick, icon, customClass, to }) => {
       {renderIcon}
     </Link>
   ) : (
-    <a className={className} onClick={onClick}>
+    <button className={className} onClick={onClick}>
       {renderIcon}
-    </a>
+    </button>
   );
 };
 

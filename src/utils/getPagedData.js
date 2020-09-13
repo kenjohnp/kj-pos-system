@@ -24,6 +24,8 @@ const getPagedData = ({
 
         if (result) return result;
       }
+
+      return null;
     });
 
   const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);

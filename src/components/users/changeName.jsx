@@ -34,7 +34,7 @@ const ChangeName = ({ match }) => {
     return () => {
       dispatch(clearErrors());
     };
-  }, []);
+  }, [dispatch, match.params.id, selectedUser]);
 
   useEffect(() => {
     setUser(selectedUser);

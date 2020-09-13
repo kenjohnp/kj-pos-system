@@ -28,7 +28,7 @@ const TransactionsHistory = () => {
 
   useEffect(() => {
     dispatch(loadTransactions());
-  }, []);
+  }, [dispatch]);
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);
@@ -74,7 +74,11 @@ const TransactionsHistory = () => {
             <i className="material-icons">add</i>
           </Link>
         </div>
-        <Search searchQuery={searchQuery} onChange={handleChange} />
+        <Search
+          searchQuery={searchQuery}
+          onChange={handleChange}
+          placeholder="Enter Transaction No."
+        />
       </div>
       <Loader loading={loading} />
       <HistoryTable data={data} onSort={handleSort} sortColumn={sortColumn} />

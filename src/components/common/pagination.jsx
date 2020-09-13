@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import _ from "lodash";
 
 const Pagination = (props) => {
@@ -16,9 +17,9 @@ const Pagination = (props) => {
           className={page === currentPage ? "active green" : "waves-effect"}
           style={{ cursor: "pointer" }}
         >
-          <a href="#" onClick={() => onPageChange(page)}>
+          <Link to="#" onClick={() => onPageChange(page)}>
             {page}
-          </a>
+          </Link>
         </li>
       ))}
     </ul>

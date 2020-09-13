@@ -55,7 +55,7 @@ const ProductForm = ({ match }) => {
       dispatch(clearErrors());
       dispatch(clearSelectedProduct());
     };
-  }, []);
+  }, [dispatch, match.params.id]);
 
   useEffect(() => {
     const product = { ...selectedProduct };

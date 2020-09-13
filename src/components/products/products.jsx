@@ -39,7 +39,7 @@ const Products = () => {
     return () => {
       dispatch(clearErrors());
     };
-  }, []);
+  }, [dispatch]);
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);

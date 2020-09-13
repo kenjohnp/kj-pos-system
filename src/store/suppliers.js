@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { apiCallBegan } from "./api";
 import moment from "moment";
-import { productsRequested } from "./products";
 
 const slice = createSlice({
   name: "suppliers",

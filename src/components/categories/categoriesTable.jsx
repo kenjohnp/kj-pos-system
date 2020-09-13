@@ -1,7 +1,5 @@
 import React, { Fragment } from "react";
-import { useSelector } from "react-redux";
 import Switch from "react-switch";
-import Loader from "../common/loader";
 import Table from "../common/table";
 
 const CategoriesTable = ({
@@ -11,7 +9,6 @@ const CategoriesTable = ({
   onDelete,
   onChange,
 }) => {
-  const loading = useSelector((state) => state.entities.categories.loading);
   const columns = [
     {
       path: "name",
@@ -31,12 +28,12 @@ const CategoriesTable = ({
       key: "options",
       content: (category) => (
         <Fragment>
-          <a
+          <button
             className="btn-floating waves-effect waves-light red ml-1"
             onClick={() => onDelete(category._id)}
           >
             <i className="material-icons">delete</i>
-          </a>
+          </button>
         </Fragment>
       ),
     },

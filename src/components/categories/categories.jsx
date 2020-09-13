@@ -39,7 +39,7 @@ const Categories = () => {
     return () => {
       dispatch(clearErrors());
     };
-  }, []);
+  }, [dispatch]);
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);

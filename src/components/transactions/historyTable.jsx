@@ -26,6 +26,12 @@ const HistoryTable = ({ data, sortColumn, onSort }) => {
     {
       path: "totalSales",
       label: "Total Sales",
+      content: (transaction) =>
+        "PHP " +
+        transaction.totalSales.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
     },
     {
       key: "options",
@@ -33,7 +39,7 @@ const HistoryTable = ({ data, sortColumn, onSort }) => {
       content: (transaction) => (
         <>
           <FloatingButton
-            to={`/transactions/${transaction._id}`}
+            to={`/transaction/${transaction._id}`}
             icon="visibility"
             customClass="green ml-1"
           />

@@ -38,7 +38,7 @@ const Suppliers = () => {
     return () => {
       dispatch(clearErrors());
     };
-  }, []);
+  }, [dispatch]);
 
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);

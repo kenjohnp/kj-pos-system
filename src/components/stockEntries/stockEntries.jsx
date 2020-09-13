@@ -27,7 +27,7 @@ const StockEntries = () => {
   useEffect(() => {
     dispatch(loadStockEntries());
     dispatch(setSuccess(false));
-  }, []);
+  }, [dispatch]);
 
   const handleChange = ({ currentTarget: input }) => {
     setSearchQuery(input.value);

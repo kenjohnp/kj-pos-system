@@ -50,7 +50,7 @@ const SupplierForm = ({ match }) => {
       dispatch(clearErrors());
       dispatch(clearSelectedSupplier());
     };
-  }, []);
+  }, [dispatch, match.params.id]);
 
   useEffect(() => {
     const supplier = { ...selectedSupplier };

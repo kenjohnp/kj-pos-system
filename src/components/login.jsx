@@ -15,7 +15,7 @@ const Login = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = await login(user.username, user.password);
+      await login(user.username, user.password);
       const { state } = props.location;
       window.location = state ? state.from.pathname : "/";
     } catch (ex) {

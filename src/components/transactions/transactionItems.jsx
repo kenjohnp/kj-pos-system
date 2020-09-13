@@ -74,7 +74,7 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
         renderInput("totalAmount", {
           totalAmount:
             item.qty *
-            (item.price - (item.discount.replace(/[^\d.-]/g, "") || 0)),
+            (item.price - (String(item.discount).replace(/[^\d.-]/g, "") || 0)),
           index: item.index,
         }),
     },
@@ -106,7 +106,7 @@ const TransactionItems = ({ items, onChange, onDelete, onChangeDiscount }) => {
       !(
         (e.keyCode > 95 && e.keyCode < 106) ||
         (e.keyCode > 47 && e.keyCode < 58) ||
-        e.keyCode == 8
+        e.keyCode === 8
       )
     ) {
       return false;

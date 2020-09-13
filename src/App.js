@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/common/protectedRoute";
 import NavBar from "./components/navBar";
@@ -19,7 +19,7 @@ import Transaction from "./components/transactions/transaction";
 import TransactionsHistory from "./components/transactions/history";
 import Login from "./components/login";
 import Logout from "./components/common/logout";
-import { Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import M from "materialize-css";
 
 function App() {
@@ -58,7 +58,12 @@ function App() {
               component={StockEntryForm}
             />
             <ProtectedRoute path="/stockentries" component={StockEntries} />
-            <ProtectedRoute path="/transaction" component={Transaction} />
+            <ProtectedRoute path="/transaction/:id" component={Transaction} />
+            <ProtectedRoute
+              exact
+              path="/transaction"
+              component={(props) => <Transaction {...props} />}
+            />
             <ProtectedRoute
               path="/transactionsHistory"
               component={TransactionsHistory}

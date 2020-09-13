@@ -31,7 +31,7 @@ const UserResetPassword = ({ match }) => {
       dispatch(setSuccess(false));
       dispatch(clearErrors());
     };
-  }, []);
+  }, [dispatch]);
 
   const handleChange = ({ currentTarget: input }) => {
     const newUser = { ...user };
