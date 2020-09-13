@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import { NavLink, Link } from "react-router-dom";
 import auth from "../services/authService";
+import logo from "../images/logo-white.png";
 
 const NavBar = () => {
   return (
@@ -17,7 +18,7 @@ const NavBar = () => {
         )}
         <div className="container">
           <Link to="/transaction" className="brand-logo">
-            KJ POS
+            <img src={logo} style={{ height: "64px" }} />
           </Link>
           {auth.getCurrentUser() && (
             <ul id="nav-mobile" className="right hide-on-med-and-down">
