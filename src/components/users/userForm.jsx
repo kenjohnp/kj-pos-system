@@ -34,7 +34,7 @@ const UserForm = () => {
     return () => {
       dispatch(clearErrors());
     };
-  }, [dispatch, initialValue, success]);
+  }, []);
 
   const schema = {
     username: Joi.string().min(5).required().label("Username"),

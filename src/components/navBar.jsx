@@ -17,7 +17,7 @@ const NavBar = () => {
           </Link>
         )}
         <div className="container">
-          <Link to="/transaction" className="brand-logo">
+          <Link to="/dashboard" className="brand-logo">
             <img src={logo} style={{ height: "64px" }} />
           </Link>
           {auth.getCurrentUser() && (

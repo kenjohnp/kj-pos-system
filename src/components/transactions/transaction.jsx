@@ -6,23 +6,12 @@ import Joi from "joi-browser";
 import { toast } from "react-toastify";
 import validate from "../../utils/validate";
 import PageTitle from "../common/pageTitle";
-import {
-  renderInput,
-  renderButton,
-  renderIconButton,
-} from "../common/renderForms";
+import { renderInput, renderButton, renderIconButton } from "../common/renderForms";
 import Select from "../common/select";
 import Loader from "../common/loader";
 import TransactionItems from "./transactionItems";
 import { loadProducts, stockDecremented } from "../../store/products";
-import {
-  transactionErrorsSet,
-  generateTransactionId,
-  addTransaction,
-  successClosed,
-  errorsCleared,
-  getTransaction,
-} from "../../store/transactions";
+import { transactionErrorsSet, generateTransactionId, addTransaction, successClosed, errorsCleared, getTransaction } from "../../store/transactions";
 import Summary from "./summary";
 import Payment from "./payment";
 
@@ -30,7 +19,7 @@ const Transaction = ({ match }) => {
   const dispatch = useDispatch();
 
   const initialValues = {
-    date: new Date().toDateString(),
+    date: new Date(),
     items: [],
     cashReceived: "",
     amountSummary: {
@@ -41,16 +30,8 @@ const Transaction = ({ match }) => {
     },
   };
 
-  const { list: products, loading: productsLoading } = useSelector(
-    (state) => state.entities.products
-  );
-  const {
-    currentNo,
-    errors,
-    loading,
-    success,
-    selectedTransaction,
-  } = useSelector((state) => state.entities.transactions);
+  const { list: products, loading: productsLoading } = useSelector((state) => state.entities.products);
+  const { currentNo, errors, loading, success, selectedTransaction } = useSelector((state) => state.entities.transactions);
 
   const productsOptions = products.map((p) => ({
     label: p.description,
@@ -124,12 +105,9 @@ const Transaction = ({ match }) => {
   };
 
   const validateProduct = (item) => {
-    const product = products.find(
-      (p) => p.barcode === item.barcode || p._id === item.productId
-    );
+    const product = products.find((p) => p.barcode === item.barcode || p._id === item.productId);
 
-    if (!product)
-      return setBarcodeErrors("Barcode/Product not found in the database.");
+    if (!product) return setBarcodeErrors("Barcode/Product not found in the database.");
 
     if (product.inStock <= 0) return setBarcodeErrors("Out of stock.");
 
@@ -156,8 +134,7 @@ const Transaction = ({ match }) => {
     });
 
     if (existingProduct) {
-      if (product.inStock <= existingProduct.qty)
-        return setBarcodeErrors("Out of stock.");
+      if (product.inStock <= existingProduct.qty) return setBarcodeErrors("Out of stock.");
 
       newTransaction.items[existingProduct.index].qty += 1;
 
@@ -180,9 +157,7 @@ const Transaction = ({ match }) => {
   };
 
   const getExistingProduct = (product) => {
-    return transaction.items.find(
-      (i) => i.barcode === product.barcode || i.productId === product.productId
-    );
+    return transaction.items.find((i) => i.barcode === product.barcode || i.productId === product.productId);
   };
 
   const handleAddProduct = () => {
@@ -193,18 +168,10 @@ const Transaction = ({ match }) => {
 
   const getTotalAmount = () =>
     transaction.items.reduce((a, b) => {
-      return (
-        a +
-        (b.qty || 0) *
-          (b.price - (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0))
-      );
+      return a + (b.qty || 0) * (b.price - (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0));
     }, 0);
 
-  const getTotalDiscount = () =>
-    transaction.items.reduce(
-      (a, b) => a + (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0),
-      0
-    );
+  const getTotalDiscount = () => transaction.items.reduce((a, b) => a + (parseFloat(b.discount.replace(/[^\d.-]/g, "")) || 0), 0);
 
   const handleSubmitBarcode = ({ currentTarget: input, key }) => {
     if (key === "Enter") {
@@ -217,11 +184,9 @@ const Transaction = ({ match }) => {
   const handleChangeQty = (index, value, currentQty) => {
     const newTransaction = { ...transaction };
 
-    if (value < 0 || value > currentQty)
-      return toast.error("Qty must not exceed current stock");
+    if (value < 0 || value > currentQty) return toast.error("Qty must not exceed current stock");
 
-    newTransaction.items[index].qty =
-      typeof value === "string" ? parseInt(value) : value;
+    newTransaction.items[index].qty = typeof value === "string" ? parseInt(value) : value;
 
     computeSummary();
     setTransaction(newTransaction);
@@ -275,8 +240,7 @@ const Transaction = ({ match }) => {
   const resetIndex = () => {
     const newTransaction = { ...transaction };
 
-    for (let i = 0; i < newTransaction.items.length; i++)
-      newTransaction.items[i].index = i;
+    for (let i = 0; i < newTransaction.items.length; i++) newTransaction.items[i].index = i;
 
     setTransaction(newTransaction);
   };
@@ -293,20 +257,17 @@ const Transaction = ({ match }) => {
       discount: parseFloat(i.discount) || 0,
     }));
 
-    const cashReceived = parseFloat(
-      transaction.cashReceived.replace(/[^\d.-]/g, "")
-    );
+    const cashReceived = parseFloat(transaction.cashReceived.replace(/[^\d.-]/g, ""));
 
     const payload = {
-      date: transaction.date,
+      date: transaction.date.toString(),
       cashReceived,
       items: transactionItems,
     };
 
     let formErrors = validate(payload, schema) || {};
 
-    if (cashReceived < totalAmount)
-      formErrors.cashReceived = "Insufficient Amount";
+    if (cashReceived < totalAmount) formErrors.cashReceived = "Insufficient Amount";
 
     dispatch(transactionErrorsSet({ errors: formErrors || {} }));
 
@@ -359,19 +320,11 @@ const Transaction = ({ match }) => {
   return (
     <>
       <PageTitle title="Transaction" />
-      {errors.apiError.message && (
-        <div className="statusBox red white-text center">
-          {errors.apiError.message}
-        </div>
-      )}
+      {errors.apiError.message && <div className="statusBox red white-text center">{errors.apiError.message}</div>}
       {success && (
         <div className="statusBox green white-text center">
           Transaction Completed. Print receipt <Link to="#">here</Link>
-          <span
-            className="badge white-text"
-            style={{ cursor: "pointer" }}
-            onClick={() => dispatch(successClosed())}
-          >
+          <span className="badge white-text" style={{ cursor: "pointer" }} onClick={() => dispatch(successClosed())}>
             <i className="material-icons">close</i>
           </span>
         </div>
@@ -394,7 +347,7 @@ const Transaction = ({ match }) => {
               label: "Transaction Date.",
               customClass: "col s2",
               disableRow: true,
-              defaultValue: transaction.date,
+              defaultValue: transaction.date.toDateString(),
               readOnly: true,
             })}
           </div>
@@ -422,17 +375,12 @@ const Transaction = ({ match }) => {
                     label="Manual Add"
                     wrappedInRow={false}
                     value={selectedProduct}
-                    onChange={(selectedItem) =>
-                      setSelectedProduct(selectedItem)
-                    }
+                    onChange={(selectedItem) => setSelectedProduct(selectedItem)}
                     error={errors.formErrors["barcode"]}
                     tableItem
                   />
                 </div>
-                <div
-                  className="col"
-                  style={{ display: "flex", alignItems: "flex-end" }}
-                >
+                <div className="col" style={{ display: "flex", alignItems: "flex-end" }}>
                   {renderButton("Add", (e) => handleAddProduct(e))}
                 </div>
               </div>
@@ -447,11 +395,7 @@ const Transaction = ({ match }) => {
                 onDelete={handleRemoveItem}
                 onChangeDiscount={handleChangeDiscount}
               />
-              {errors.formErrors.items && (
-                <div className="statusBox red white-text center">
-                  {errors.formErrors.items}
-                </div>
-              )}
+              {errors.formErrors.items && <div className="statusBox red white-text center">{errors.formErrors.items}</div>}
             </div>
           </div>
         </div>
@@ -469,9 +413,7 @@ const Transaction = ({ match }) => {
             <Summary data={transaction.amountSummary} />
           </div>
         </div>
-        {buttonGroup.map((b) =>
-          renderIconButton(b.label, b.onClick, b.icon, b.size, b.color, b.link)
-        )}
+        {buttonGroup.map((b) => renderIconButton(b.label, b.onClick, b.icon, b.size, b.color, b.link))}
       </div>
     </>
   );

@@ -18,7 +18,7 @@ const SideNav = () => {
           <a className="subheader">Main</a>
         </li>
         <li>
-          <Link to="/transaction" className="sidenav-close">
+          <Link to="/dashboard" className="sidenav-close">
             <i className="material-icons">dashboard</i>Go to Dashboard
           </Link>
         </li>

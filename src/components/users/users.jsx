@@ -33,6 +33,7 @@ const Users = () => {
   useEffect(() => {
     dispatch(loadUsers());
     dispatch(setSuccess(false));
+
     return () => {
       dispatch(clearErrors());
     };
